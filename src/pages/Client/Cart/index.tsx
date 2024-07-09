@@ -5,16 +5,13 @@ import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ProductType } from "@/types/index";
 import { authentication_token, imageUrl, setCartCount } from "@/lib";
-import Loader from "@/components/Loader";
 import { routes } from "@/routes/route";
 import { ApiEndPoint, endpoints } from "@/routes/api";
 
 export default function CheckoutSummary() {
   const navigation = useNavigate();
   const [cartItems, setCartItems] = useState<ProductType[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<ProductType[]>([]);
-
 
   const handleSelectSingleItem = (id: string) => {
     const product = cartItems.find((item) => item.id === id);
@@ -75,8 +72,6 @@ export default function CheckoutSummary() {
     navigation(routes.checkout, { state: selectedItems });
 
   useEffect(() => {
-    if (authentication_token == null) return navigation(routes.login);
-    setIsLoading(true);
     const fetchCartItems = async () => {
       const { data } = await axios.get(
         ApiEndPoint(endpoints.fetch_cart_items, ""),
@@ -84,7 +79,6 @@ export default function CheckoutSummary() {
           headers: { Authorization: authentication_token },
         }
       );
-      setIsLoading(false);
       if (!data.isError) {
         setCartItems(
           data.payload.map((product: ProductType) => ({
@@ -99,9 +93,7 @@ export default function CheckoutSummary() {
     fetchCartItems();
   }, [navigation]);
 
-  return isLoading ? (
-    <Loader />
-  ) : (
+  return (
     <div className="w-full flex flex-col md:flex-row justify-center gap-5 md:gap-2 px-2 mx:px-0">
       <div className="w-full flex flex-col">
         <p>CART ITEMS ({cartItems?.length})</p>
