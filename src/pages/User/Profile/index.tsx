@@ -1,0 +1,99 @@
+import { authentication_token } from "@/lib";
+import { ApiEndPoint, endpoints } from "@/routes/api";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { AddressType } from "@/types/index";
+
+// type AddressType = {}
+
+export default function Profile() {
+  const [user, setUser] = useState<AddressType>();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await axios.get(
+        ApiEndPoint(endpoints.fetch_user_address, ""),
+        {
+          headers: { Authorization: authentication_token },
+        }
+      );
+      if (!data.isError) {
+        setUser(data.payload[0]);
+      }
+    };
+    fetchUser();
+  }, []);
+  return (
+    <div>
+      <div
+        className="flex flex-col gap-8 text-sm text-dark-gray-100 [&_span]:bg-deep-gray-200 
+        [&_span]:text-neutral-500 [&_span]:rounded-lg [&_span]:py-3 [&_span]:px-2 [&_span]:capitalize"
+      >
+        <div className="flex flex-col gap-5">
+          <h1 className="text-2xl font-semibold">Personal Information</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+            <div className="flex flex-col gap-1">
+              <p className="">First name</p>
+              <span>
+                <p>{user?.firstname}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>Last name</p>
+              <span>
+                <p>{user?.lastname}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>Email</p>
+              <span>
+                <p className="lowercase">{user?.email}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>Phone</p>
+              <span>
+                <p>{user?.phone_number}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-5">
+          <h1 className="text-2xl font-semibold">Contact Details</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+            <div className="flex flex-col gap-1">
+              <p>Address Line</p>
+              <span>
+                <p>{user?.address_line}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>City</p>
+              <span>
+                <p>{user?.city}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>State</p>
+              <span>
+                <p>{user?.state}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>Country</p>
+              <span>
+                <p>{user?.country}</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p>Postal Code</p>
+              <span>
+                <p>{user?.zip_code}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
