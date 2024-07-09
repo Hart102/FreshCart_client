@@ -1,4 +1,5 @@
-export const api = "http://localhost:5000/api";
+// export const api = "http://localhost:5000/api";
+export const api = "https://ecommerce-express-server-seven.vercel.app";
 
 export const ApiEndPoint = (endpoint: string, params: string) =>
   params == "" ? `${api}/${endpoint}` : `${api}/${endpoint}/${params}`;
