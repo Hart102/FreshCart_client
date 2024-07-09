@@ -41,7 +41,7 @@ export default function Address() {
   useEffect(() => {
     const fetchUserAddress = async () => {
       const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_user_role_address, ""),
+        ApiEndPoint(endpoints.fetch_user_address, ""),
         {
           headers: { Authorization: authentication_token },
         }
