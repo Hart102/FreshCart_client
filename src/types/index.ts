@@ -5,7 +5,7 @@ export type ModalTemplateType = {
 };
 
 export type ProductType = {
-  id: string;
+  _id: string;
   images: string[];
   name: string;
   price: string;
@@ -18,25 +18,28 @@ export type ProductType = {
   isChecked: boolean;
   totalPrice: string | number;
   demanded_quantity: number;
-  cartId: string;
+  cart_id: string;
 };
 
 export type AddressType = {
-  id: string;
+  _id: string;
   firstname: string;
   lastname: string;
   email: string;
-  user_id: string;
-  address_line: string;
-  city: string;
-  country: string;
-  phone_number: string;
   state: string;
-  zip_code: string;
+  addresses: {
+    _id: string;
+    address_line: string;
+    phone: string;
+    city: string;
+    country: string;
+    state: string;
+    zipcode: string;
+  }[];
 };
 
 export type PaymentCardType = {
-  id: string;
+  _id: string;
   user_id: string;
   card_number: string;
   card_name: string;
@@ -45,9 +48,9 @@ export type PaymentCardType = {
 };
 
 export type OrderType = {
-  id: string;
+  _id: string;
   images: string[];
-  productId: string;
+  // product_id: string;
   quantity: number;
   price: number;
   status: string;
@@ -70,7 +73,7 @@ export type CustomerOrderType = {
   demanded_quantity: number;
   email: string;
   firstname: string;
-  id: number;
+  _id: number;
   images: string[];
   lastname: string;
   name: string;
@@ -88,7 +91,7 @@ export type CustomerOrderType = {
 };
 
 export type CategoryWithProductCount = {
-  id: number;
+  _id: number;
   name: string;
   status: string;
   createdAt: Date;

@@ -42,13 +42,9 @@ export default function AddAddress() {
       headers: { Authorization: authentication_token },
     });
     const response = await request.data;
+    setResponse({ isError: response.isError, message: response.message });
     handleChangeModalContent("03");
-    if (response.error) {
-      setResponse({ isError: true, message: response.error });
-    } else {
-      reset();
-      setResponse({ isError: false, message: response.message });
-    }
+    if (!response.isEror) reset();
   };
   const InputProps = {
     label: "mb-16",
@@ -75,9 +71,9 @@ export default function AddAddress() {
                   label="Address"
                   placeholder="No, 7 aba oweri road"
                   classNames={InputProps}
-                  {...register("address")}
+                  {...register("address_line")}
                 />
-                <span>{errors?.address?.message}</span>
+                <span>{errors?.address_line?.message}</span>
               </div>
               <div>
                 <Input

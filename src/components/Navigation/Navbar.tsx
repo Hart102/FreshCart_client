@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaAngleDown, FaSearch, FaTimes } from "react-icons/fa";
-import { BiCartAdd, BiGridAlt, BiShoppingBag } from "react-icons/bi";
+import { BiGridAlt, BiShoppingBag } from "react-icons/bi";
 import { FaBars } from "react-icons/fa6";
 import axios from "axios";
 
@@ -47,7 +47,7 @@ export default function Navbar() {
     });
   };
 
-  const fetchUser = async () => {
+  const fetchUserRole = async () => {
     if (authentication_token) {
       const { data } = await axios.get(
         ApiEndPoint(endpoints.fetch_user_role, ""),
@@ -56,11 +56,10 @@ export default function Navbar() {
         }
       );
       if (!data.isError) {
-        setUserRole(data.payload[0].user_role);
+        setUserRole(data.payload.user_role);
       }
     }
   };
-
   const Logout = async () => {
     const { data } = await axios.post(ApiEndPoint(endpoints.logout, ""));
     if (!data.isError) {
@@ -82,7 +81,7 @@ export default function Navbar() {
         setCategories(data.payload);
       }
     };
-    fetchUser();
+    fetchUserRole();
     FetchCategories();
   }, []);
 
@@ -220,35 +219,65 @@ export default function Navbar() {
         {/* Mobile */}
         <div
           className={`block md:hidden w-screen h-screen absolute top-0 bg-white z-30 p-4 duration-300 delay-300 ${
-            !isOpen ? "-translate-x-full" : "translate-x-0"
+            !isMenuOpen ? "-translate-x-full" : "translate-x-0"
           }`}
         >
           <div className="w-full flex flex-col gap-5">
-            <div className="flex items-center justify-between">
-              <Link
-                to={routes.home}
-                className="font-bold text-2xl flex items-center gap-2"
-              >
-                <BiCartAdd size={30} className="text-deep-blue-100" />
-                FreshCart
-              </Link>
+            <div className="flex items-center justify-end">
               <Button>
                 <FaTimes
                   onClick={Toggle}
                   size={23}
-                  className="text-dark-gray-100"
+                  className="text-deep-gray-100"
                 />
               </Button>
             </div>
-            <div className="w-full flex items-center justify-between border rounded-lg px-4 bg-white">
-              <input
-                type="text"
-                placeholder="Search for products"
-                className="py-2 w-96 text-dark-gray-100 outline-none"
-              />
-              <FaSearch className="text-deep-gray-100" />
-            </div>
+
             <div className="flex flex-col gap-10">
+              <div>
+                <div className="flex items-center gap-1">
+                  <p>Account</p>
+                  <FaAngleDown />
+                </div>
+                <ul className="[&_li]:px-4 [&_li]:py-2 [&_li]:text-dark-gray-100 [&_li]:hover:text-deep-blue-100">
+                  <li
+                    className={
+                      authentication_token == undefined ? "block" : "hidden"
+                    }
+                  >
+                    <Link to={routes.login}>Signin</Link>
+                  </li>
+                  <li
+                    className={
+                      authentication_token == undefined ? "block" : "hidden"
+                    }
+                  >
+                    <Link to={routes.register}>Signup</Link>
+                  </li>
+                  <li
+                    className={
+                      authentication_token !== undefined ? "block" : "hidden"
+                    }
+                  >
+                    <Link to={routes.register}>Logout</Link>
+                  </li>
+                  <li
+                    className={`${
+                      userRole == "admin" || authentication_token == undefined
+                        ? "hidden"
+                        : "block"
+                    }`}
+                  >
+                    <Link to={routes.user_profile}>My Account</Link>
+                  </li>
+                  <li
+                    className={userRole == "admin" ? dropDownClass : "hidden"}
+                  >
+                    <Link to={routes.dashboard_products}>Dashboad</Link>
+                  </li>
+                </ul>
+              </div>
+
               <Dropdown className="w-screen">
                 <DropdownTrigger>
                   <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">
@@ -277,7 +306,37 @@ export default function Navbar() {
                   </DropdownMenu>
                 )}
               </Dropdown>
-              <Dropdown className="w-screen">
+
+              {/* <Dropdown className="w-screen">
+                <DropdownTrigger>
+                  <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">
+                    <BiGridAlt size={23} />
+                    All Departments
+                  </Button>
+                </DropdownTrigger>
+                {categories && categories.length > 0 && (
+                  <DropdownMenu
+                    aria-label="Static Actions"
+                    className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
+                  >
+                    {categories.map((category) => (
+                      <DropdownItem
+                        key={category.id}
+                        onClick={() => {
+                          ChangeCategory(category.name);
+                        }}
+                        className={`${dropDownClass} ${
+                          category.status == "active" ? "block" : "hidden"
+                        }`}
+                      >
+                        {category.name}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                )}
+              </Dropdown> */}
+
+              {/* <Dropdown className="w-screen">
                 <DropdownTrigger>
                   <div className="p-0 text-dark-gray-100 flex items-center gap-2">
                     Account
@@ -327,7 +386,9 @@ export default function Navbar() {
                     Dashboard
                   </DropdownItem>
                 </DropdownMenu>
-              </Dropdown>
+              </Dropdown> */}
+
+              <div className="flex "></div>
             </div>
           </div>
         </div>

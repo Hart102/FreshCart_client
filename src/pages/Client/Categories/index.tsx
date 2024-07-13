@@ -106,7 +106,7 @@ export default function Categories() {
           >
             {products &&
               products?.map((product) => (
-                <ProductTemplate key={product.id} product={product} />
+                <ProductTemplate key={product._id} product={product} />
               ))}
           </div>
         </div>

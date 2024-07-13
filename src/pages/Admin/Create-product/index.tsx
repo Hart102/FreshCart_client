@@ -147,7 +147,7 @@ export default function AddProduct() {
     formData.append("description", data.description);
     //Edit
     if (location.state !== null) {
-      formData.append("id", location.state.id);
+      formData.append("id", location.state._id);
       formData.append("replacedImageIds", JSON.stringify(replacedImages));
       if (files.length < 1) {
         formData.append("images", JSON.stringify(productImages));
@@ -221,8 +221,8 @@ export default function AddProduct() {
                   {categories &&
                     categories.map((category) => (
                       <SelectItem
-                        key={category.name}
-                        value={category.name}
+                        key={category._id}
+                        value={category._id}
                         className="capitalize text-sm my-1 py-2 text-dark-gray-100 rounded-lg border border-transparent hover:border-deep-blue-100"
                       >
                         {category.name}
@@ -287,23 +287,23 @@ export default function AddProduct() {
               <div className="flex gap-2 items-center">
                 <input
                   type="radio"
-                  id="active"
-                  value="active"
+                  id="available"
+                  value="available"
                   {...register("status")}
                 />
-                <label htmlFor="active" className="text-app-gray-200">
-                  Active
+                <label htmlFor="available" className="text-app-gray-200">
+                  Available
                 </label>
               </div>
               <div className="flex gap-2 items-center">
                 <input
                   type="radio"
-                  id="disable"
-                  value="disabled"
+                  id="out of stock"
+                  value="out of stock"
                   {...register("status")}
                 />
-                <label htmlFor="disable" className="text-app-gray-200">
-                  Disable
+                <label htmlFor="out of stock" className="text-app-gray-200">
+                  Out of stock
                 </label>
               </div>
             </div>

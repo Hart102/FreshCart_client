@@ -16,20 +16,21 @@ export default function Address() {
   const [currentTemplate, setCurrentTemplate] = useState<string>("");
   const [templateType, setTemplateType] = useState<string>("");
   const [response, setResponse] = useState({ isError: false, message: "" });
-  const [userAddress, setUserAddress] = useState<AddressType[]>([]);
+  const [user, setUser] = useState<AddressType | null>(null);
   const [index, setIndex] = useState<number>(0);
-
 
   const switchModal = (modalType: string) => {
     setTemplateType(modalType);
     onOpen();
   };
+
   const templates = ModalTemplates({
     onCancle: onClose,
     onContinue: () => deleteAddress(),
     confirmationMessage: "Are you sure you want to delete this ?",
     response,
   });
+
   const handleChangeModalContent = (template: string) => {
     changeModalContent({
       template,
@@ -39,7 +40,7 @@ export default function Address() {
     });
   };
   useEffect(() => {
-    const fetchUserAddress = async () => {
+    const fetchaddress = async () => {
       const { data } = await axios.get(
         ApiEndPoint(endpoints.fetch_user_address, ""),
         {
@@ -50,10 +51,11 @@ export default function Address() {
         setResponse({ isError: data.isError, message: data.message });
         handleChangeModalContent("03");
       } else {
-        setUserAddress(data.payload);
+        setUser(data.payload);
+        console.log(user);
       }
     };
-    fetchUserAddress();
+    fetchaddress();
   }, []);
 
   const GetAddressIndex = (index: number) => {
@@ -64,15 +66,16 @@ export default function Address() {
 
   const deleteAddress = async () => {
     handleChangeModalContent("01");
+    const address_id = user && user?.addresses[index]?._id;
     const { data } = await axios.delete(
-      ApiEndPoint(endpoints.delete_address, userAddress[index]?.id),
+      ApiEndPoint(endpoints.delete_address, `${address_id}`),
       {
         headers: { Authorization: authentication_token },
       }
     );
     handleChangeModalContent("03");
     setResponse({ isError: data.isError, message: data.message });
-    if (!data.isError) userAddress.splice(index, 1);
+    if (!data.isError) user?.addresses?.splice(index, 1);
   };
 
   return (
@@ -90,11 +93,11 @@ export default function Address() {
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {userAddress &&
-          userAddress[0]?.id !== null &&
-          userAddress?.map((address, index) => (
+        {user &&
+          user?.addresses?.length > 0 &&
+          user?.addresses?.map((address, index) => (
             <div
-              key={address?.id}
+              key={address?._id}
               className="border border-deep-gray-50 rounded-lg p-5"
             >
               <FaMapMarkerAlt className="text-deep-red-100" />
@@ -104,7 +107,7 @@ export default function Address() {
                   {address?.city}, {address?.state}
                 </p>
                 <p>{address?.country}</p>
-                <p>{address?.phone_number}</p>
+                <p>{address?.phone}</p>
               </div>
               <div className="flex gap-10 text-sm justify-between mt-4">
                 <Button

@@ -70,18 +70,16 @@ export default function SideBar({
   return (
     <>
       <aside className="flex flex-col gap-8 px-4 md:px- md:py-5">
-        <div
-          className={`text-2xl font-bold first-letter:text-3xl md:ml-1${
-            status ? "block" : "hidden"
+        <Link
+          to={""}
+          className={`${
+            status
+              ? "font-bold text-3xl hidden md:flex items-center gap-2"
+              : "hidden"
           }`}
         >
-          <Link
-            to={""}
-            className="font-bold text-3xl hidden md:flex items-center gap-2"
-          >
-            OnlineStore
-          </Link>
-        </div>
+          OnlineStore
+        </Link>
         {!status && (
           <div className="flex md:hidden items-center justify-end mt-4">
             <FaTimes onClick={closeMenu} />

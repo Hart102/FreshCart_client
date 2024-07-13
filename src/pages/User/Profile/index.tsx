@@ -4,8 +4,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { AddressType } from "@/types/index";
 
-// type AddressType = {}
-
 export default function Profile() {
   const [user, setUser] = useState<AddressType>();
 
@@ -18,7 +16,7 @@ export default function Profile() {
         }
       );
       if (!data.isError) {
-        setUser(data.payload[0]);
+        setUser(data.payload);
       }
     };
     fetchUser();
@@ -53,7 +51,7 @@ export default function Profile() {
             <div className="flex flex-col gap-1">
               <p>Phone</p>
               <span>
-                <p>{user?.phone_number}</p>
+                <p>{user?.addresses[0]?.phone}</p>
               </span>
             </div>
           </div>
@@ -64,31 +62,31 @@ export default function Profile() {
             <div className="flex flex-col gap-1">
               <p>Address Line</p>
               <span>
-                <p>{user?.address_line}</p>
+                <p>{user?.addresses[0]?.address_line}</p>
               </span>
             </div>
             <div className="flex flex-col gap-1">
               <p>City</p>
               <span>
-                <p>{user?.city}</p>
+                <p>{user?.addresses[0]?.city}</p>
               </span>
             </div>
             <div className="flex flex-col gap-1">
               <p>State</p>
               <span>
-                <p>{user?.state}</p>
+                <p>{user?.addresses[0]?.state}</p>
               </span>
             </div>
             <div className="flex flex-col gap-1">
               <p>Country</p>
               <span>
-                <p>{user?.country}</p>
+                <p>{user?.addresses[0]?.country}</p>
               </span>
             </div>
             <div className="flex flex-col gap-1">
               <p>Postal Code</p>
               <span>
-                <p>{user?.zip_code}</p>
+                <p>{user?.addresses[0]?.zipcode}</p>
               </span>
             </div>
           </div>

@@ -32,13 +32,14 @@ export default function SingleProduct() {
     if (!data.isError) {
       setRelatedProducts(data.payload);
     }
+    console.log(data);
   }, [location?.state?.category]);
 
   const AddToCart = async () => {
     const { data } = await axios.put(
       ApiEndPoint(endpoints.add_to_cart, ""),
       {
-        productId: product?.id,
+        product_id: product?._id,
         quantity: quantity,
       },
       { headers: { Authorization: authentication_token } }
@@ -67,7 +68,7 @@ export default function SingleProduct() {
               classNames={{
                 img: "w-[510px] h-[250px] md:h-[320px]",
               }}
-              className="rounded-lg overflow-hidden"
+              className="rounded-lg overflow-h_idden"
             />
             <div className="flex gap-3">
               {product &&
@@ -136,7 +137,7 @@ export default function SingleProduct() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {relatedProducts &&
               relatedProducts?.map((product) => (
-                <ProductTemplate key={product.id} product={product} />
+                <ProductTemplate key={product._id} product={product} />
               ))}
           </div>
         </div>

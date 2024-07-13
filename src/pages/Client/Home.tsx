@@ -16,10 +16,14 @@ export default function Home() {
       ApiEndPoint(endpoints.fetch_all_products, "")
     );
     if (!data.isError) {
-      for (let i = 0; i < 8; i++) {
-        product_container.push(data.payload[i]);
+      if (data.payload.length < 8) {
+        setProducts(data.payload);
+      } else {
+        for (let i = 0; i < 8; i++) {
+          product_container.push(data.payload[i]);
+        }
+        setProducts(product_container);
       }
-      setProducts(product_container);
     }
   };
 
@@ -63,7 +67,7 @@ export default function Home() {
         {products && products.length > 0 && (
           <AliceCarousel
             items={products.map((product) => (
-              <div key={product.id} className="mx-3">
+              <div key={product._id} className="mx-3">
                 <ProductTemplate product={product} />
               </div>
             ))}
@@ -83,7 +87,7 @@ export default function Home() {
           {products &&
             products.length > 0 &&
             products?.map((product) => (
-              <ProductTemplate key={product.id} product={product} />
+              <ProductTemplate key={product?._id} product={product} />
             ))}
         </div>
       </div>

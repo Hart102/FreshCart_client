@@ -26,7 +26,7 @@ import { routes } from "@/routes/route";
 import { ApiEndPoint, endpoints } from "@/routes/api";
 
 type CategoryWithProductCount = {
-  id: number;
+  _id: number;
   name: string;
   status: string;
   createdAt: Date;
@@ -89,7 +89,7 @@ export default function Categories() {
 
   const DeleteCategory = async () => {
     const { data } = await axios.delete(
-      ApiEndPoint(endpoints.delete_category_by_id, `${categorie[index]?.id}`),
+      ApiEndPoint(endpoints.delete_category_by_id, `${categorie[index]?._id}`),
       {
         headers: { Authorization: authentication_token },
       }
@@ -162,7 +162,7 @@ export default function Categories() {
               <TableBody>
                 {searchResult.map((category, index) => (
                   <TableRow
-                    key={category.id}
+                    key={category._id}
                     className={`hover:bg-deep-gray-50 cursor-pointer ${
                       index % 2 == 0 ? "bg-white" : "bg-deep-gray-200"
                     }`}

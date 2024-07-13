@@ -56,7 +56,7 @@ export default function EditAndEditCategory() {
   const endpoint =
     location.state == null
       ? ApiEndPoint(endpoints.create_categories, "")
-      : ApiEndPoint(endpoints.edit_category_using_id, location.state.id);
+      : ApiEndPoint(endpoints.edit_category_using_id, location.state._id);
 
   const handleApiRequest = async (data: addCategorySchema) => {
     handleChangeModalContent("01");
@@ -100,16 +100,16 @@ export default function EditAndEditCategory() {
                 value="active"
                 {...register("status")}
               />
-              <label htmlFor="active">Activate</label>
+              <label htmlFor="active">Active</label>
             </div>
             <div className="flex gap-2 items-center">
               <input
                 type="radio"
-                id="disabled"
-                value="disabled"
+                id="inactive"
+                value="inactive"
                 {...register("status")}
               />
-              <label htmlFor="disabled">Disable</label>
+              <label htmlFor="inactive">Inactive</label>
             </div>
             {errors?.status?.message && <span>{errors?.status?.message}</span>}
           </div>

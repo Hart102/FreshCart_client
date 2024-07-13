@@ -35,10 +35,7 @@ export default function Products() {
   const [currentTemplate, setCurrentTemplate] = useState<string>("");
   const [response, setResponse] = useState({ isError: false, message: "" });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedProduct, setSelectedProduct] = useState<{
-    index: number;
-    id: string | number;
-  }>({ index: 0, id: 0 });
+  const [index, setIndex] = useState<number>(0);
 
   const FetchProducts = async () => {
     setIsLoading(true);
@@ -87,7 +84,7 @@ export default function Products() {
     const request = await axios.delete(
       ApiEndPoint(
         endpoints.delete_product_using_products_id,
-        `${selectedProduct.id}`
+        `${products[index]._id}`
       ),
       {
         headers: { Authorization: authentication_token },
@@ -100,13 +97,13 @@ export default function Products() {
     } else {
       setResponse({ isError: response.isError, message: response.message });
       handleChangeModalContent("03");
-      products.splice(selectedProduct.index, 1);
+      products.splice(index, 1);
       setProducts([...products]);
     }
   };
 
-  const OpenDeleteProductModal = (index: number, id: string | number) => {
-    setSelectedProduct({ ...selectedProduct, index, id });
+  const OpenDeleteProductModal = (index: number) => {
+    setIndex(index);
     handleChangeModalContent("02");
   };
   const ViewProduct = (product: ProductType) =>
@@ -179,7 +176,7 @@ export default function Products() {
             >
               {searchResult.map((product, index) => (
                 <TableRow
-                  key={product?.id}
+                  key={product?._id}
                   className={`hover:bg-deep-gray-50 cursor-pointer ${
                     index % 2 == 0 ? "bg-white" : "bg-deep-gray-200"
                   }`}
@@ -239,9 +236,7 @@ export default function Products() {
                         </DropdownItem>
                         <DropdownItem
                           className="py-1 my-1 rounded hover:bg-deep-blue-100 hover:text-white"
-                          onClick={() =>
-                            OpenDeleteProductModal(index, product?.id)
-                          }
+                          onClick={() => OpenDeleteProductModal(index)}
                         >
                           Delete
                         </DropdownItem>

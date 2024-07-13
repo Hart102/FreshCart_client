@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 export const addAddressSchema = yup.object().shape({
-  address: yup.string().required("This field is required"),
+  address_line: yup.string().required("This field is required"),
   city: yup.string().required("This field is required"),
   state: yup.string().required("This field is required"),
   country: yup.string().required("This field is required"),
