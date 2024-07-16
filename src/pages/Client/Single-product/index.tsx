@@ -3,16 +3,16 @@ import { Button, Image } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BiStar, BiCartAdd } from "react-icons/bi";
+import { ProductType } from "@/types/index";
+import ProductTemplate from "@/components/ProductTemplate";
+import { routes } from "@/routes/route";
+import { ApiEndPoint, endpoints } from "@/routes/api";
 import {
   imageUrl,
   authentication_token,
   setCartCount,
   getCartCount,
 } from "@/lib";
-import { ProductType } from "@/types/index";
-import ProductTemplate from "@/components/ProductTemplate";
-import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
 
 export default function SingleProduct() {
   const location = useLocation();
