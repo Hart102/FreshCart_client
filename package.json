@@ -12,6 +12,9 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "@nextui-org/react": "^2.3.6",
+    "@reduxjs/toolkit": "^2.2.7",
+    "@types/react-redux": "^7.1.33",
+    "@types/redux": "^3.6.0",
     "axios": "^1.7.2",
     "framer-motion": "^11.1.7",
     "next-themes": "^0.3.0",
@@ -23,6 +26,8 @@
     "react-icons": "^5.1.0",
     "react-router-dom": "^6.23.0",
     "react-scroll": "^1.9.0",
+    "sweetalert2": "^11.12.4",
+    "sweetalert2-react-content": "^5.0.7",
     "yup": "^1.4.0"
   },
   "devDependencies": {

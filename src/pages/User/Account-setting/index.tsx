@@ -1,20 +1,17 @@
-import { useRef, useState } from "react";
-import axios from "axios";
-import { Input, Button, useDisclosure } from "@nextui-org/react";
+import { useEffect, useRef, useState } from "react";
+import { Button, Spinner } from "@nextui-org/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { editDetailsSchema } from "@/schema/AccountSettingSchema";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
-import { authentication_token } from "@/lib";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "@/components/api";
+import { showAlert } from "@/util/alert";
+import { UserType } from "@/types/index";
 
 export default function AccountSetting() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  const [response, setResponse] = useState({ isError: false, message: "" });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [user, setUser] = useState<UserType>();
   const [password, setPassword] = useState<{
     oldPassword: string;
     newPassword: string;
@@ -25,75 +22,65 @@ export default function AccountSetting() {
   const newPasswordRef = useRef(null);
   const oldPasswordRef = useRef(null);
 
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => console.log("clicked"),
-    confirmationMessage: "Are you sure you want to delete this ?",
-    response,
-  });
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
-  };
   const {
     register,
     handleSubmit,
-    reset,
+    setValue,
     formState: { errors },
-  } = useForm<editDetailsSchema>({ resolver: yupResolver(editDetailsSchema) });
+  } = useForm<editDetailsSchema>({
+    resolver: yupResolver(editDetailsSchema),
+  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await instance.get("/user/");
+      if (!data.isError) {
+        setUser(data.payload);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    setValue("firstname", user?.firstname || "");
+    setValue("lastname", user?.lastname || "");
+    setValue("email", user?.email || "");
+  }, [setValue, user]);
 
   const EditProfile = async (data: editDetailsSchema) => {
-    handleChangeModalContent("01");
-    const request = await axios.patch(
-      ApiEndPoint(endpoints.edit_profile, ""),
-      data,
-      {
-        headers: { Authorization: authentication_token },
-      }
-    );
+    setIsLoading(true);
+    const request = await instance.patch("/user/edit-profile", data);
     const response = request.data;
-    handleChangeModalContent("03");
-    setResponse({ isError: response.isError, message: response.message });
-    if (!response.isError) {
-      reset();
+    setIsLoading(false);
+    if (response.isError) {
+      showAlert("Error", response?.message, "error");
+    } else {
+      showAlert("Success", response?.message, "success");
     }
   };
 
-  const setOldPassword = (e: string) =>
+  const setOldPassword = (e: string) => {
     setPassword({ ...password, oldPassword: e });
-  const setNewPassword = (e: string) =>
+  };
+  const setNewPassword = (e: string) => {
     setPassword({ ...password, newPassword: e });
+  };
 
   const ResetPassword = async () => {
-    const { data } = await axios.patch(
-      ApiEndPoint(endpoints.reset_password, ""),
-      { oldPassword: password.oldPassword, newPassword: password.newPassword },
-      {
-        headers: { Authorization: authentication_token },
-      }
-    );
-    setResponse({ isError: data.isError, message: data.message });
-    handleChangeModalContent("03");
-    // if (data.isError) {
-    // } else {
-    //   setResponse({ isError: false, message: data.message });
-    //   // if (oldPasswordRef.current && newPasswordRef.current) {
-    //   //   oldPasswordRef.current.value = "";
-    //   //   newPasswordRef.current.value = "";
-    //   // }
-    // }
+    setLoading(true);
+    const { data } = await instance.patch("/user/reset-password", {
+      oldPassword: password.oldPassword,
+      newPassword: password.newPassword,
+    });
+    setLoading(false);
+    if (data?.isError) {
+      return showAlert("Error", data?.message, "error");
+    }
+    showAlert("Success", data?.message, "success");
   };
 
-  const InputProps = {
-    label: "mb-16",
-    inputWrapper: "px-0 flex",
-    input: "p-2 outline-none rounded-lg text-dark-gray-100 bg-deep-gray-200",
-    base: "text-sm text-neutral-5001 mb-2 py-2 z-0",
-  };
+  const InputClass =
+    "bg-default-100 rounded-lg w-full outline-none p-2 mt-2 border border-transparent focus:border-deep-blue-100";
 
   return (
     <>
@@ -101,84 +88,99 @@ export default function AccountSetting() {
         <div className="flex flex-col gap-8 [&_span]:text-xs [&_span]:text-deep-red-100">
           <h1 className="text-xl md:text-3xl font-bold">Account Setting</h1>
           <form className="w-full md:w-1/2">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               <div>
-                <Input
-                  label="First Name"
-                  labelPlacement="outside"
-                  placeholder="tim"
-                  classNames={InputProps}
+                <label htmlFor="firstname">Firstname</label>
+                <input
+                  type="text"
+                  id="firstname"
                   {...register("firstname")}
+                  className={InputClass}
                 />
                 <span>{errors?.firstname?.message}</span>
               </div>
               <div>
-                <Input
-                  label="Last Name"
-                  labelPlacement="outside"
-                  placeholder="*****"
-                  classNames={InputProps}
+                <label htmlFor="lastname">Lastname</label>
+                <input
+                  type="text"
+                  id="lastname"
                   {...register("lastname")}
+                  className={InputClass}
                 />
                 <span>{errors?.lastname?.message}</span>
               </div>
               <div>
-                <Input
-                  label="Email"
-                  labelPlacement="outside"
-                  placeholder="tim@gmail.com"
-                  classNames={InputProps}
+                <label htmlFor="email">Email</label>
+                <input
+                  type="text"
+                  id="email"
                   {...register("email")}
+                  className={InputClass}
                 />
                 <span>{errors?.email?.message}</span>
               </div>
             </div>
             <Button
               onClick={handleSubmit(EditProfile)}
-              className="bg-deep-blue-100 text-white rounded-lg mt-5"
+              disabled={isLoading}
+              className={`bg-deep-blue-100 text-white rounded-lg mt-5 ${
+                isLoading && "opacity-65"
+              }`}
             >
-              Save Details
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner color="white" /> Saving...
+                </div>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </form>
-          <form className="mt-10">
+          <form className="mt-10 flex flex-col gap-6">
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
               <div>
-                <Input
+                <label htmlFor="oldPassword">Old Password</label>
+                <input
                   type="password"
-                  ref={oldPasswordRef}
-                  label="Old Password"
-                  labelPlacement="outside"
+                  id="oldPassword"
                   placeholder="*****"
-                  classNames={InputProps}
-                  onValueChange={setOldPassword}
+                  ref={oldPasswordRef}
+                  className={InputClass}
+                  onChange={(event) => setOldPassword(event.target.value)}
                 />
               </div>
               <div>
-                <Input
+                <label htmlFor="newPassword">New Password</label>
+                <input
                   type="password"
-                  ref={newPasswordRef}
-                  label="New Password"
-                  labelPlacement="outside"
+                  id="newPassword"
                   placeholder="*****"
-                  classNames={InputProps}
-                  onValueChange={setNewPassword}
+                  ref={newPasswordRef}
+                  className={InputClass}
+                  onChange={(event) => setNewPassword(event.target.value)}
                 />
               </div>
             </div>
             <div className="md:pr-4">
               <Button
                 onClick={ResetPassword}
-                className="w-1/2 bg-deep-blue-100 text-white rounded-lg"
+                disabled={loading}
+                className={`w-1/2 bg-deep-blue-100 text-white rounded-lg ${
+                  loading && "opacity-65"
+                }`}
               >
-                Save Password
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner color="white" /> Saving Password...
+                  </div>
+                ) : (
+                  "Save Password"
+                )}
               </Button>
             </div>
           </form>
         </div>
       </div>
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout>
     </>
   );
 }

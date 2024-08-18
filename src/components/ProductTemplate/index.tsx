@@ -1,31 +1,30 @@
-import { Button, Image } from "@nextui-org/react";
+import { useState } from "react";
+import { Button, Image, Spinner } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
-import { BiStar } from "react-icons/bi";
-import axios from "axios";
-import {
-  authentication_token,
-  getCartCount,
-  imageUrl,
-  setCartCount,
-} from "@/lib";
+import { BiShoppingBag, BiStar } from "react-icons/bi";
+import { getCartCount, imageUrl, setCartCount } from "@/lib";
 import { ProductType } from "@/types/index";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "../api";
+import { ProtectedRoute } from "../api/auth";
 
 export default function ProductTemplate({ product }: { product: ProductType }) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const navigation = useNavigate();
-  const ViewProduct = (cat: ProductType) =>
+  const ViewProduct = (cat: ProductType) => {
     navigation(routes?.single_product, { state: cat });
+  };
 
   const AddToCart = async (productId: string) => {
-    const { data } = await axios.put(
-      ApiEndPoint(endpoints?.add_to_cart, ""),
-      {
-        productId: productId,
-        quantity: 1,
-      },
-      { headers: { Authorization: authentication_token } }
-    );
+    ProtectedRoute();
+    setIsLoading(true);
+    const { data } = await instance.put("/cart/add-to-cart", {
+      product_id: productId,
+      quantity: 1,
+    });
+
+    setIsLoading(false);
     if (data?.total_items) {
       setCartCount(data?.total_items);
       getCartCount();
@@ -35,8 +34,8 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
   return (
     <div
       onClick={() => ViewProduct(product)}
-      className="p-4 flex flex-col items-center gap-5 rounded-lg shadow bg-white
-         border border-deep-gray-200 hover:border-deep-blue-100 cursor-pointer"
+      className="p-4 flex flex-col items-center gap-4 rounded-lg bg-white
+        border border-deep-gray-300 hover:border-deep-blue-100 cursor-pointer"
     >
       <Image
         width={150}
@@ -45,7 +44,7 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
       />
       <div className="w-full mt-2 z-10">
         <p className="text-sm text-deep-gray-100 capitalize">
-          {product?.category}
+          {product?.category_name}
         </p>
         <b className="capitalize text-xl1 font-bold">{product?.name}</b>
         <div className="flex flex-wrap items-center gap-2 md:gap-5">
@@ -63,10 +62,14 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
         <b>{product?.price}</b>
         <Button
           size="sm"
-          onClick={() => AddToCart(product?.id)}
-          className="bg-deep-blue-100 text-white text-sm font-semibold rounded"
+          onClick={() => AddToCart(product?._id)}
+          className="bg-transparent text-sm font-semibold rounded outline-none"
         >
-          Add
+          {isLoading ? (
+            <Spinner size="sm" />
+          ) : (
+            <BiShoppingBag size={24} className="text-deep-blue-100" />
+          )}
         </Button>
       </div>
     </div>

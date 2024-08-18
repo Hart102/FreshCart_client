@@ -1,20 +1,13 @@
-import { authentication_token } from "@/lib";
-import { ApiEndPoint, endpoints } from "@/routes/api";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { AddressType } from "@/types/index";
+import instance from "@/components/api";
 
 export default function Profile() {
   const [user, setUser] = useState<AddressType>();
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_user_address, ""),
-        {
-          headers: { Authorization: authentication_token },
-        }
-      );
+      const { data } = await instance.get("/user//");
       if (!data.isError) {
         setUser(data.payload);
       }
@@ -24,7 +17,7 @@ export default function Profile() {
   return (
     <div>
       <div
-        className="flex flex-col gap-8 text-sm text-dark-gray-100 [&_span]:bg-deep-gray-200 
+        className="flex flex-col gap-8 text-dark-gray-100 [&_span]:bg-deep-gray-200 
         [&_span]:text-neutral-500 [&_span]:rounded-lg [&_span]:py-3 [&_span]:px-2 [&_span]:capitalize"
       >
         <div className="flex flex-col gap-5">

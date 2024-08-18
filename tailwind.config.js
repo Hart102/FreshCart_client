@@ -1,6 +1,11 @@
 /** @type {import('tailwindcss').Config} */
+import { nextui } from "@nextui-org/react";
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
@@ -30,7 +35,7 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [nextui()],
 };
 // 27272A
 // 18181B
@@ -40,3 +45,35 @@ export default {
 
 // dark-green: 1E474E
 // 198754;
+
+
+// /** @type {import('tailwindcss').Config} */
+// // const plugin = require("tailwindcss/plugin");
+// const scrollbar = require("tailwind-scrollbar");
+// import { nextui } from "@nextui-org/react";
+
+// export default {
+//   content: [
+//     "./src/**/*.{js,ts,jsx,tsx}",
+//     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+//   ],
+//   darkMode: "class",
+//   theme: {
+//     extend: {
+//       colors: {
+//         "light-gray-100": "#9CA3A2",
+//         "deep-gray-50": "#1E1E1E",
+//         "deep-grey-200": "#111111",
+//         "deep-dark": "#0d0e0f",
+//         "deep-yellow-100": "#FEAB00",
+//         "deep-red-100": "#F75368",
+//         "deep-blue-50": "#E2E8FF",
+//         "deep-blue-100": "#584ADE",
+//         "deep-green-50": "#091E29",
+//         "deeep-green-100": "#011722",
+//         pinkgradient: "rgb(247,114,91)",
+//       },
+//     },
+//   },
+//   plugins: [scrollbar({ nocompatible: true }),nextui()],
+// };

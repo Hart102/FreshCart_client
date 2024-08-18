@@ -11,28 +11,33 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  // useDisclosure,
 } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { imageUrl, dateOptions } from "@/lib";
+import axios from "axios";
+import { authentication_token, imageUrl, dateOptions } from "@/lib";
+// import { ModalLayout } from "@/components/Modal";
+// import ModalTemplates, {
+//   changeModalContent,
+// } from "@/components/Modal/Complete-modal-templates";
 import { OrderType } from "@/types/index";
 import { routes } from "@/routes/route";
-import instance from "@/components/api";
-import { showAlert } from "@/util/alert";
-import { useDispatch } from "react-redux";
-import { openModal } from "@/redux/modal_actions";
-import { ConfirmationModal, Loader } from "@/components/Templates";
-import { BiSearch } from "react-icons/bi";
+import { ApiEndPoint, endpoints } from "@/routes/api";
 
 export default function Orders() {
   const navigation = useNavigate();
-  const dispatch = useDispatch();
+  // const { isOpen, onOpen, onClose } = useDisclosure();
   const [orders, setOrders] = useState<OrderType[]>([]);
+  // const [currentTemplate, setCurrentTemplate] = useState<string>("");
+  // const [response, setResponse] = useState({ isError: false, message: "" });
   const [searchString, setSearchString] = useState<string>("");
   const [index, setIndex] = useState<number>(0);
 
+  console.log(index);
+
   const searchResult = useMemo(() => {
-    if (orders?.length > 0) {
+    if (orders.length > 0) {
       return orders.filter((order) => {
         return (
           order.transaction_reference
@@ -46,7 +51,7 @@ export default function Orders() {
         );
       });
     } else {
-      return [];
+      return orders;
     }
   }, [orders, searchString]);
 
@@ -55,73 +60,84 @@ export default function Orders() {
   }, []);
 
   const FetchOrders = async () => {
-    const { data } = await instance.get("/transactions/fetch-order-by-userId");
-    if (data.error) {
-      showAlert("Error", data?.message, "error");
+    const { data } = await axios.get(
+      ApiEndPoint(endpoints.fetch_all_orders, ""),
+      {
+        headers: { Authorization: authentication_token },
+      }
+    );
+    if (data.isError) {
+      // setResponse({ isError: data.isError, message: data.message });
+      // handleChangeModalContent("03");
     } else {
       setOrders(data.payload);
     }
   };
 
-  const DeleteOrder = async () => {
-    dispatch(openModal(<Loader />, "md"));
-    const { data } = await instance.delete(
-      `/transactions/delete-order/${orders[index]._id}`
-    );
-    if (data.isError) {
-      showAlert("Error", data?.message, "error");
-    } else {
-      orders.splice(index, 1);
-      setOrders([...orders]);
-      showAlert("Success", "Order deleted successfully", "success");
-    }
-  };
+  // const DeleteOrder = async () => {
+  //   // handleChangeModalContent("01");
+  //   const { data } = await axios.delete(
+  //     ApiEndPoint(endpoints.delete_order, `${orders[index].id}`),
+  //     {
+  //       headers: { Authorization: authentication_token },
+  //     }
+  //   );
+  //   if (data.error) {
+  //     setResponse({ isError: true, message: data.error });
+  //     // handleChangeModalContent("03");
+  //   } else {
+  //     orders.splice(index, 1);
+  //     setOrders([...orders]);
+  //     setResponse({ isError: false, message: data.message });
+  //     // handleChangeModalContent("03");
+  //   }
+  // };
 
-  const handleDeletemodal = (index: number) => {
+  // const templates = ModalTemplates({
+  //   onCancle: onClose,
+  //   onContinue: () => DeleteOrder(),
+  //   confirmationMessage: "Are you sure you want to delete this ?",
+  //   response,
+  // });
+
+  // const handleChangeModalContent = (template: string) => {
+  //   changeModalContent({
+  //     template,
+  //     templates,
+  //     onOpen,
+  //     setCurrentTemplate,
+  //   });
+  // };
+
+  const openDeleteModal = (index: number) => {
     setIndex(index);
-    dispatch(
-      openModal(
-        <ConfirmationModal
-          message="Are you sure "
-          onContinue={() => DeleteOrder()}
-        />,
-        "md"
-      )
-    );
+    // handleChangeModalContent("02");
   };
-
   const ViewOrder = (id: string) =>
-    navigation(routes.user_single_order, { state: id });
+    navigation(routes.dashboard_single_order, { state: id });
 
   return (
     <>
-      <div className="bg-white text-dark-gray-100 flex flex-col gap-4">
-        <form className="flex w-1/2 items-center gap-2 md:ml-4">
+      <div className="flex flex-col gap-4">
+        <form className="w-full md:w-1/2 px-4">
           <Input
             size="sm"
             type="search"
-            startContent={
-              <BiSearch
-                size={25}
-                className="bg-white h-full pl-2 rounded-l-lg"
-              />
-            }
-            placeholder="Search by Name or order Id"
+            placeholder="Search category by name"
             classNames={{
               base: "h-10 text-sm outline-0 border rounded-lg",
-              mainWrapper: "h-full hover:bg-whites",
-              input:
-                "text-small focus:bg-white bg-white w-full rounded-r-lg px-3",
-              inputWrapper: "h-full font-normal px-0",
+              mainWrapper: "h-full",
+              input: "text-small",
+              inputWrapper: "h-full font-normal hover:border-0",
             }}
             style={{ outline: "0" }}
             onValueChange={setSearchString}
           />
         </form>
+
         <Table
-          shadow="none"
           classNames={{
-            base: "text-center",
+            base: "text-center overflow-x-scroll md:overflow-x-auto",
             th: "capitalize bg-dark-gray-200",
             tbody: "capitalize py-4 text-sm",
           }}
@@ -135,14 +151,20 @@ export default function Orders() {
             <TableColumn>Date</TableColumn>
             <TableColumn>Actions</TableColumn>
           </TableHeader>
-          {searchResult && searchResult?.length > 0 ? (
+          {searchResult && searchResult.length > 0 ? (
             <TableBody>
-              {searchResult?.map((order, index) => (
-                <TableRow key={order?._id}>
+              {searchResult.map((order, index) => (
+                <TableRow
+                  key={order?.id}
+                  className={`hover:bg-deep-gray-50 cursor-pointer ${
+                    index % 2 == 0 ? "bg-white" : "bg-deep-gray-200"
+                  }`}
+                >
                   <TableCell>
-                    <div className="flex items-center gap-4">
+                    <div className="md:flex items-center gap-4">
                       <Image
                         src={imageUrl(order?.images[0])}
+                        className="hidden md:block"
                         classNames={{ img: "h-[50px] w-[50px]" }}
                       />
                       {order?.name}
@@ -174,14 +196,14 @@ export default function Orders() {
                         className="z-10 bg-white text-sm"
                       >
                         <DropdownItem
-                          className="py-1 my-1 rounded hover:bg-deep-blue-100 hover:text-white"
-                          onClick={() => ViewOrder(order?._id)}
+                          className="py-1 my-1 rounded text-deep-green-100 hover:bg-deep-blue-100 hover:text-white"
+                          onClick={() => ViewOrder(order?.id)}
                         >
-                          View Order
+                          View
                         </DropdownItem>
                         <DropdownItem
-                          className="py-1 my-1 rounded hover:bg-deep-blue-100 hover:text-white"
-                          onClick={() => handleDeletemodal(index)}
+                          className="py-1 my-1 rounded text-deep-green-100 hover:bg-deep-blue-100 hover:text-white"
+                          onClick={() => openDeleteModal(index)}
                         >
                           Delete
                         </DropdownItem>
@@ -196,6 +218,9 @@ export default function Orders() {
           )}
         </Table>
       </div>
+      {/* <ModalLayout isOpen={isOpen} onClose={onClose}>
+        {templates[currentTemplate]}
+      </ModalLayout> */}
     </>
   );
 }

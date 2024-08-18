@@ -1,81 +1,60 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { Button, useDisclosure } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { FaMapMarkerAlt, FaPencilAlt } from "react-icons/fa";
-import { authentication_token } from "@/lib";
 import { AddressType } from "@/types/index";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
 import AddAddress from "@/components/Create-address";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import { useDispatch } from "react-redux";
+import { closeModal, openModal } from "@/redux/modal_actions";
+import instance from "@/components/api";
+import { showAlert } from "@/util/alert";
+import { ConfirmationModal, Loader } from "@/components/Templates/index";
 
 export default function Address() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  const [templateType, setTemplateType] = useState<string>("");
-  const [response, setResponse] = useState({ isError: false, message: "" });
+  const dispatch = useDispatch();
   const [user, setUser] = useState<AddressType | null>(null);
   const [index, setIndex] = useState<number>(0);
 
-  const switchModal = (modalType: string) => {
-    setTemplateType(modalType);
-    onOpen();
-  };
-
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => deleteAddress(),
-    confirmationMessage: "Are you sure you want to delete this ?",
-    response,
-  });
-
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
-  };
   useEffect(() => {
     const fetchaddress = async () => {
-      const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_user_address, ""),
-        {
-          headers: { Authorization: authentication_token },
-        }
-      );
-      if (data.isError) {
-        setResponse({ isError: data.isError, message: data.message });
-        handleChangeModalContent("03");
-      } else {
+      const { data } = await instance.get("/user//");
+      if (!data.isError) {
         setUser(data.payload);
-        console.log(user);
       }
     };
     fetchaddress();
   }, []);
 
-  const GetAddressIndex = (index: number) => {
-    handleChangeModalContent("02");
-    switchModal("");
+  const handleAddAddressModal = () => {
+    dispatch(openModal(<AddAddress />, "4xl"));
+  };
+
+  const handleDeleteModal = (index: number) => {
+    dispatch(
+      openModal(
+        <ConfirmationModal
+          message="Are you sure you want to Delete Address ?"
+          onContinue={DeleteAddress}
+        />,
+        "md"
+      )
+    );
     setIndex(index);
   };
 
-  const deleteAddress = async () => {
-    handleChangeModalContent("01");
+  const DeleteAddress = async () => {
+    dispatch(openModal(<Loader />, "md"));
+
     const address_id = user && user?.addresses[index]?._id;
-    const { data } = await axios.delete(
-      ApiEndPoint(endpoints.delete_address, `${address_id}`),
-      {
-        headers: { Authorization: authentication_token },
-      }
+    const { data } = await instance.delete(
+      `/user/delete-address/${address_id}`
     );
-    handleChangeModalContent("03");
-    setResponse({ isError: data.isError, message: data.message });
-    if (!data.isError) user?.addresses?.splice(index, 1);
+    if (data?.isError) {
+      showAlert("Error", data?.message, "error");
+    } else {
+      user?.addresses?.splice(index, 1);
+      showAlert("Success", data?.message, "success");
+      dispatch(closeModal());
+    }
   };
 
   return (
@@ -84,9 +63,8 @@ export default function Address() {
         <Button
           size="sm"
           type="button"
-          onClick={() => switchModal("add")}
-          className="py-1 px-2 rounded flex items-center gap-1 border 
-          border-deep-blue-100 hover:bg-deep-blue-100 hover:text-white"
+          onClick={handleAddAddressModal}
+          className="py-1 px-2 rounded flex items-center gap-1 bg-deep-blue-100  text-white"
         >
           <FaMapMarkerAlt />
           <p className="text-sm font-semibold">ADD ADDRESS</p>
@@ -111,8 +89,8 @@ export default function Address() {
               </div>
               <div className="flex gap-10 text-sm justify-between mt-4">
                 <Button
-                  onClick={() => GetAddressIndex(index)}
-                  className="flex items-center gap-1 px-0 hover:underline font-semibold text-deep-red-100 "
+                  onClick={() => handleDeleteModal(index)}
+                  className="flex items-center gap-1 px-0 hover:underline font-semibold bg-transparent text-deep-red-100 "
                 >
                   <FaPencilAlt />
                   Delete
@@ -121,9 +99,6 @@ export default function Address() {
             </div>
           ))}
       </div>
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templateType == "add" ? <AddAddress /> : templates[currentTemplate]}
-      </ModalLayout>
     </>
   );
 }

@@ -7,14 +7,14 @@ import Login from "@/pages/Login";
 
 // Client
 import MainLayout from "@/layout/client";
-import Home from "@/pages/Client/Home";
-import Categories_page from "@/pages/Client/Categories";
-import SingleProduct from "@/pages/Client/Single-product";
-import Cart from "@/pages/Client/Cart";
-import Checkout from "@/pages/Client/Checkout";
+import Home from "@/pages/Home";
+import Categories_page from "@/pages/Categories";
+import SingleProduct from "@/pages/Single-product";
+import Cart from "@/pages/Cart";
+import Checkout from "@/pages/Checkout";
 
 // Reused
-import SingleOrder from "@/pages/Admin/SingleOrder";
+import SingleOrder from "@/pages/SingleOrder";
 
 // USER
 import UserDasboardLayout from "@/layout/user";
@@ -26,13 +26,13 @@ import AccountSetting from "@/pages/User/Account-setting";
 
 // Admin
 import DashboardLayout from "@/layout/dashboard";
-import AddProduct from "@/pages/Admin/Create-product";
-import ProductsPage from "@/pages/Admin/Products";
-import Orders from "@/pages/Admin/Orders";
-import Customers from "@/pages/Admin/Customers";
-import Categories from "@/pages/Admin/Categories";
-import ProductView from "@/pages/Admin/ProductView";
-import CreateAndEditCategory from "@/pages/Admin/CreateAndEditCategory";
+import AddProduct from "@/pages/Create_product";
+import ProductsPage from "@/pages/Products";
+import Orders from "@/pages/Orders";
+import Customers from "@/pages/Customers";
+import Categories from "@/pages/Dashboard_categories";
+import ProductView from "@/pages/ProductView";
+import CreateAndEditCategory from "@/pages/Create_and_edit_category";
 
 export const router = createBrowserRouter([
   {
@@ -72,7 +72,7 @@ export const router = createBrowserRouter([
     children: [
       { path: routes.dashboard_products, element: <ProductsPage /> },
       {
-        path: `${routes.dashboard_create_edit_products}/:action`,
+        path: `${routes.dashboard_create_edit_products}/:id`,
         element: <AddProduct />,
       },
       { path: routes.dashboard_orders, element: <Orders /> },

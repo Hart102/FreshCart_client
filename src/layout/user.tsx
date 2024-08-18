@@ -1,25 +1,22 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useDisclosure } from "@nextui-org/react";
 import SideBar from "@/components/Navigation/SideBar";
 import {
   BiBell,
   BiCreditCard,
   BiCartAdd,
   BiMenuAltRight,
+  BiCog,
 } from "react-icons/bi";
-import { FaMapMarkerAlt, FaToggleOn } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import NewNavBar from "@/components/Navigation/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@nextui-org/react";
-import axios from "axios";
-import { authentication_token } from "@/lib";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import ModalLayout from "@/components/Modal_layout";
+import instance from "@/components/api";
+import { showAlert } from "@/util/alert";
+
 
 const links = [
   {
@@ -32,55 +29,32 @@ const links = [
     title: "My Orders",
     href: routes.user_my_orders,
   },
-  { icon: FaToggleOn, title: "Settings", href: routes.user_setting },
+  { icon: BiCog, title: "Settings", href: routes.user_setting },
   { icon: FaMapMarkerAlt, title: "Address", href: routes.user_address },
   { icon: BiBell, title: "Notification", href: "" },
 ];
 
 export default function UserDasboardLayout() {
-  const { isOpen, onClose, onOpen } = useDisclosure();
   const [paymentStatus, setPaymentStatus] = useState(false);
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  const [response, setResponse] = useState({ isError: false, message: "" });
   const [toggleStatus, setToggleStatus] = useState<boolean>(false);
 
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => console.log("clicked from dashboard layout"),
-    confirmationMessage: "",
-    response,
-  });
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
-  };
   const toggle = () =>
     !toggleStatus ? setToggleStatus(true) : setToggleStatus(false);
 
   const confirmPayment = async () => {
-    onOpen();
-    handleChangeModalContent("01");
-    const { data } = await axios.get(
-      ApiEndPoint(endpoints.confirm_payment, ""),
-      {
-        headers: { Authorization: authentication_token },
-      }
-    );
-    handleChangeModalContent("03");
-    setResponse({ ...response, isError: data.isError, message: data.message });
+    const { data } = await instance.get("/transactions/confirm-payment");
+    if (data?.isError) {
+      showAlert("Error", data.message, "error");
+      return;
+    }
+    showAlert("Success", data?.message, "success");
   };
+
   useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
-        const { data } = await axios.get(
-          ApiEndPoint(endpoints.fetch_uncompleted_transactions, ""),
-          {
-            headers: { Authorization: authentication_token },
-          }
+        const { data } = await instance.get(
+          "/transactions/getUncompleted-payment"
         );
         if (!data.isError && data.payload.length > 0) {
           setPaymentStatus(true);
@@ -133,10 +107,8 @@ export default function UserDasboardLayout() {
           </div>
         </div>
       </div>
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout>
       <Footer />
+      <ModalLayout />
     </>
   );
 }

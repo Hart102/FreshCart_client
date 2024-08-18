@@ -1,34 +1,14 @@
-import { useState } from "react";
-import { Button, Input, useDisclosure } from "@nextui-org/react";
-import axios from "axios";
+import { Button, Input, Spinner } from "@nextui-org/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { addAddressSchema } from "@/schema/addressSchema";
-import { api, authentication_token } from "@/lib";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
+import instance from "../api";
+import { showAlert } from "@/util/alert";
+import { useState } from "react";
 
 export default function AddAddress() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  const [response, setResponse] = useState({ isError: false, message: "" });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => console.log("clicked"),
-    confirmationMessage: "",
-    response,
-  });
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
-  };
   const {
     register,
     handleSubmit,
@@ -37,20 +17,23 @@ export default function AddAddress() {
   } = useForm<addAddressSchema>({ resolver: yupResolver(addAddressSchema) });
 
   const onSubmit = async (data: addAddressSchema) => {
-    handleChangeModalContent("01");
-    const request = await axios.post(`${api}/user/add-address`, data, {
-      headers: { Authorization: authentication_token },
-    });
+    setIsLoading(true);
+    const request = await instance.post("/user/add-address", data);
     const response = await request.data;
-    setResponse({ isError: response.isError, message: response.message });
-    handleChangeModalContent("03");
-    if (!response.isEror) reset();
+    setIsLoading(false);
+    if (response.isError) {
+      showAlert("Error", response?.message, "error");
+    } else {
+      showAlert("Success", response?.message, "success");
+      reset();
+    }
   };
+
   const InputProps = {
-    label: "mb-16",
+    label: "mb-16 text-base",
     inputWrapper: "px-0 flex",
-    input: "p-2 outline-none bg-deep-gray-200 rounded-lg",
-    base: "text-sm mb-2 py-2",
+    input: "p-2 outline-none bg-transparent rounded-lg",
+    base: "my-4",
   };
   return (
     <>
@@ -65,7 +48,7 @@ export default function AddAddress() {
             </div>
           </div>
           <div className="md:py-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 [&_span]:text-red-500 [&_span]:text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 [&_span]:text-red-500 [&_span]:text-xs1">
               <div>
                 <Input
                   label="Address"
@@ -125,18 +108,20 @@ export default function AddAddress() {
               <Button
                 variant="light"
                 onClick={handleSubmit(onSubmit)}
-                className="bg-deep-blue-100 font-semibold text-white rounded-lg px-20 mt-5"
+                className="bg-deep-blue-100 hover:text-black font-semibold text-white rounded-lg px-20 mt-5"
               >
-                SAVE
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner color="white" /> Saving...
+                  </div>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </div>
           </div>
         </form>
       </div>
-
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout>
     </>
   );
 }

@@ -59,3 +59,13 @@ export const dateOptions: { year: "numeric"; month: "long"; day: "numeric" } = {
   month: "long",
   day: "numeric",
 };
+
+
+// const instance = axios.create({
+//   baseURL: "https://api.revampevents.com", // API's base URL
+//   // baseURL: "http://localhost:5000", // API's base URL
+//   headers: {
+//     "Content-Type": "application/json",
+//     Authorization: `Bearer ${token}`,
+//   },
+// });

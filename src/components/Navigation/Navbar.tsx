@@ -5,98 +5,91 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-  useDisclosure,
 } from "@nextui-org/react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaAngleDown, FaSearch, FaTimes } from "react-icons/fa";
 import { BiGridAlt, BiShoppingBag } from "react-icons/bi";
 import { FaBars } from "react-icons/fa6";
-import axios from "axios";
-
 import { authentication_token, getCartCount } from "@/lib";
 import { CategoryWithProductCount } from "@/types/index";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
+import instance from "@/components/api/index";
+import { useDispatch } from "react-redux";
+import { openModal } from "@/redux/modal_actions";
+import { ConfirmationModal, ResponseModal } from "@/components/Templates/index";
 
 export default function Navbar() {
   const navigation = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const dispatch = useDispatch();
   const [isMenuOpen, setIsOpen] = useState<boolean>(false);
   const [userRole, setUserRole] = useState<string>("");
   const [cartCount, setCartCount] = useState<string | number>();
   const [categories, setCategories] = useState<CategoryWithProductCount[]>([]);
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  const [response, setResponse] = useState({ isError: false, message: "" });
 
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => Logout(),
-    confirmationMessage: "Are you sure you want to logout ?",
-    response,
-  });
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
+  const confirmLogout = () => {
+    dispatch(
+      openModal(
+        <ConfirmationModal
+          onContinue={() => Logout()}
+          message="Are you sure you want to logout ?"
+        />,
+        "1xl"
+      )
+    );
   };
 
   const fetchUserRole = async () => {
     if (authentication_token) {
-      const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_user_role, ""),
-        {
-          headers: { Authorization: authentication_token },
-        }
-      );
+      const { data } = await instance.get("/user/fetch-user-role");
+
       if (!data.isError) {
-        setUserRole(data.payload.user_role);
+        setUserRole(data.payload);
       }
     }
   };
+
   const Logout = async () => {
-    const { data } = await axios.post(ApiEndPoint(endpoints.logout, ""));
+    const { data } = await instance.post("/user/logout");
     if (!data.isError) {
       document.cookie =
         "online_store" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       window.location.reload();
-      onClose();
     } else {
-      setResponse({ isError: data.isError, message: data.message });
+      dispatch(
+        openModal(
+          <ResponseModal isError={data.isError} message={data.message} />,
+          "1xl"
+        )
+      );
     }
   };
 
   useEffect(() => {
     const FetchCategories = async () => {
-      const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_all_categories, "")
-      );
+      const { data } = await instance.get("/categories/fetch-all-categorie");
       if (!data.isError) {
         setCategories(data.payload);
       }
     };
-    fetchUserRole();
     FetchCategories();
+    fetchUserRole();
   }, []);
 
   setInterval(() => {
     setCartCount(getCartCount());
   }, 3000);
+
   const Toggle = () => (!isMenuOpen ? setIsOpen(true) : setIsOpen(false));
-  const ChangeCategory = (cat: string) =>
+
+  const ChangeCategory = (cat: string) => {
     navigation(`${routes.categories}/${cat}`);
+  };
 
   const dropDownClass = "my-1 hover:bg-deep-gray-50 py-1 rounded-md";
   return (
     <>
       <nav className="w-screen relative md:sticky md:-top-[4.5rem] z-50 bg-white">
-        <div className=" flex flex-col gap-2">
+        <div className="mx-auto flex flex-col gap-2">
           <div className="border-b border-deep-gray-50">
             <div className="w-full md:w-11/12 px-5 py-3 md:py-4 md:px-14 mx-auto flex items-center justify-between">
               <Link
@@ -124,7 +117,7 @@ export default function Navbar() {
                 <Button
                   onClick={Toggle}
                   size="sm"
-                  className="px-0 block md:hidden"
+                  className="px-0 flex justify-end md:hidden bg-transparent"
                 >
                   <FaBars size={23} className="text-deep-gray-100" />
                 </Button>
@@ -146,7 +139,7 @@ export default function Navbar() {
                 >
                   {categories.map((category) => (
                     <DropdownItem
-                      key={category.id}
+                      key={category._id}
                       onClick={() => {
                         ChangeCategory(category.name);
                       }}
@@ -162,7 +155,7 @@ export default function Navbar() {
             </Dropdown>
             <Dropdown>
               <DropdownTrigger>
-                <Button size="sm" className="p-0 text-dark-gray-100 flex">
+                <Button className="p-0 text-dark-gray-100 bg-transparent flex">
                   Account
                   <FaAngleDown />
                 </Button>
@@ -180,7 +173,7 @@ export default function Navbar() {
                   Signin
                 </DropdownItem>
                 <DropdownItem
-                  onClick={() => handleChangeModalContent("02")}
+                  onPress={confirmLogout}
                   className={`${dropDownClass} ${
                     authentication_token !== undefined ? "block" : "hidden"
                   }`}
@@ -205,14 +198,13 @@ export default function Navbar() {
                 >
                   My Account
                 </DropdownItem>
-                <DropdownItem
-                  onClick={() => navigation(routes.dashboard_products)}
-                  className={userRole == "admin" ? dropDownClass : "hidden"}
-                >
-                  Dashboard
-                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
+            {userRole == "admin" && (
+              <Link to={routes.dashboard_products} className="">
+                Dashboard
+              </Link>
+            )}
           </div>
         </div>
 
@@ -224,7 +216,7 @@ export default function Navbar() {
         >
           <div className="w-full flex flex-col gap-5">
             <div className="flex items-center justify-end">
-              <Button>
+              <Button size="sm" className="bg-transparent">
                 <FaTimes
                   onClick={Toggle}
                   size={23}
@@ -232,7 +224,6 @@ export default function Navbar() {
                 />
               </Button>
             </div>
-
             <div className="flex flex-col gap-10">
               <div>
                 <div className="flex items-center gap-1">
@@ -277,7 +268,6 @@ export default function Navbar() {
                   </li>
                 </ul>
               </div>
-
               <Dropdown className="w-screen">
                 <DropdownTrigger>
                   <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">
@@ -292,7 +282,7 @@ export default function Navbar() {
                   >
                     {categories.map((category) => (
                       <DropdownItem
-                        key={category.id}
+                        key={category._id}
                         onClick={() => {
                           ChangeCategory(category.name);
                         }}
@@ -306,96 +296,10 @@ export default function Navbar() {
                   </DropdownMenu>
                 )}
               </Dropdown>
-
-              {/* <Dropdown className="w-screen">
-                <DropdownTrigger>
-                  <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">
-                    <BiGridAlt size={23} />
-                    All Departments
-                  </Button>
-                </DropdownTrigger>
-                {categories && categories.length > 0 && (
-                  <DropdownMenu
-                    aria-label="Static Actions"
-                    className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
-                  >
-                    {categories.map((category) => (
-                      <DropdownItem
-                        key={category.id}
-                        onClick={() => {
-                          ChangeCategory(category.name);
-                        }}
-                        className={`${dropDownClass} ${
-                          category.status == "active" ? "block" : "hidden"
-                        }`}
-                      >
-                        {category.name}
-                      </DropdownItem>
-                    ))}
-                  </DropdownMenu>
-                )}
-              </Dropdown> */}
-
-              {/* <Dropdown className="w-screen">
-                <DropdownTrigger>
-                  <div className="p-0 text-dark-gray-100 flex items-center gap-2">
-                    Account
-                    <FaAngleDown />
-                  </div>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Static Actions"
-                  className="bg-white text-dark-gray-100 text-sm px-2 w-[150px]"
-                >
-                  <DropdownItem
-                    onClick={() => navigation(routes.login)}
-                    className={`${dropDownClass} ${
-                      authentication_token == undefined ? "block" : "hidden"
-                    }`}
-                  >
-                    Signin
-                  </DropdownItem>
-                  <DropdownItem
-                    onClick={() => handleChangeModalContent("02")}
-                    className={`${dropDownClass} ${
-                      authentication_token !== undefined ? "block" : "hidden"
-                    }`}
-                  >
-                    Logout
-                  </DropdownItem>
-                  <DropdownItem
-                    className={`${dropDownClass} ${
-                      authentication_token == undefined ? "block" : "hidden"
-                    }`}
-                  >
-                    Signup
-                  </DropdownItem>
-                  <DropdownItem
-                    className={`${
-                      userRole == "admin" || authentication_token == undefined
-                        ? "hidden"
-                        : "block"
-                    }`}
-                  >
-                    My Account
-                  </DropdownItem>
-                  <DropdownItem
-                    onClick={() => navigation(routes.dashboard_products)}
-                    className={userRole == "admin" ? dropDownClass : "hidden"}
-                  >
-                    Dashboard
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown> */}
-
-              <div className="flex "></div>
             </div>
           </div>
         </div>
       </nav>
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout>
     </>
   );
 }

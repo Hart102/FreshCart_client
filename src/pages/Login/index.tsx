@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { Input, Button, useDisclosure } from "@nextui-org/react";
+import { Input, Button, Spinner } from "@nextui-org/react";
 import { Link, useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "@/schema/register_login_schema";
 import { authentication_token } from "@/lib";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import { showAlert } from "@/util/alert";
+import instance from "@/components/api";
 
 interface CookieOptions {
   name: string;
@@ -20,30 +16,8 @@ interface CookieOptions {
 }
 
 export default function Login() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const navigation = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<{
-    isError: boolean;
-    message: string;
-  }>({ isError: false, message: "" });
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => console.log("login"),
-    confirmationMessage: "",
-    response,
-  });
-
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
-  };
 
   const {
     register,
@@ -53,16 +27,11 @@ export default function Login() {
 
   const onSubmit = async (data: LoginSchema) => {
     setIsLoading(true);
-    const request = await axios.post(ApiEndPoint(endpoints.login, ""), data);
+    const request = await instance.post("/user/login", data);
     const response = await request.data;
     setIsLoading(false);
     if (response.isError) {
-      setResponse({
-        ...response,
-        isError: response.isError,
-        message: response.message,
-      });
-      handleChangeModalContent("03");
+      showAlert("Error", response?.message, "error");
       return;
     }
     // SET COOKIE FUNCTION
@@ -78,17 +47,15 @@ export default function Login() {
     };
     setCookie({ name: "online_store", value: response.payload });
 
-    if (response.user_role == "admin") {
-      navigation(routes.dashboard_products);
+    if (response?.user_role == "admin") {
+      return (window.location.href = routes.dashboard_products);
     } else {
-      navigation(routes.user_profile);
+      window.location.href = routes.user_profile;
     }
-    window.location.reload();
   };
 
   useEffect(() => {
-    if (authentication_token !== undefined)
-      return navigation(routes.user_profile);
+    if (authentication_token !== undefined) return navigation(routes.home);
   }, [navigation]);
 
   const InputProps = {
@@ -103,8 +70,7 @@ export default function Login() {
       <div className="p-5">
         <form className="w-full md:w-5/12 mx-auto p-5">
           <h1 className="text-2xl font-semibold mb-10">Welcome Back !</h1>
-
-          <div className="flex flex-col gap-8 [&_span]:text-xs [&_span]:text-deep-red-100">
+          <div className="flex flex-col gap-4 [&_span]:text-xs [&_span]:text-deep-red-100">
             <div>
               <Input
                 type="email"
@@ -128,12 +94,9 @@ export default function Login() {
               <span>{errors?.password?.message}</span>
             </div>
           </div>
-
-          <div className="flex justify-end">
-            <Link
-              to="/register"
-              className="text-sm text-deep-green-200 hover:underline"
-            >
+          <div className="flex gap-2 text-sm">
+            Don't have an account yet ?{" "}
+            <Link to={routes.register} className="text-deep-blue-100">
               Signup
             </Link>
           </div>
@@ -142,16 +105,22 @@ export default function Login() {
               type="submit"
               onClick={handleSubmit(onSubmit)}
               disabled={isLoading}
-              className="w-full bg-deep-blue-100 text-white rounded-lg"
+              className={`w-full bg-deep-blue-100 text-white rounded-lg ${
+                isLoading && "opacity-65"
+              }`}
             >
-              {!isLoading ? "LOGIN" : "PLEASE WAIT"}
+              {!isLoading ? (
+                "LOGIN"
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Spinner color="white" />
+                  PLEASE WAIT
+                </div>
+              )}
             </Button>
           </div>
         </form>
       </div>
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout>
     </>
   );
 }

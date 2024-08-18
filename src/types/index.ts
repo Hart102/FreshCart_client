@@ -9,7 +9,6 @@ export type ProductType = {
   images: string[];
   name: string;
   price: string;
-  category: string;
   quantity: number;
   size: string;
   description: string;
@@ -19,22 +18,21 @@ export type ProductType = {
   totalPrice: string | number;
   demanded_quantity: number;
   cart_id: string;
+  category_name: string;
+  category_id: string;
+  category: string;
+  // categoryDetails: {
+  //   _id: string;
+  //   name: string;
+  // };
 };
 
-export type AddressType = {
-  _id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  state: string;
-  addresses: {
-    _id: string;
-    address_line: string;
-    phone: string;
-    city: string;
-    country: string;
-    state: string;
-    zipcode: string;
+export type ShoppingBagType = {
+  addressId: string;
+  totalPrice: number;
+  products: {
+    productId: string;
+    demandedQuantity: number;
   }[];
 };
 
@@ -96,4 +94,37 @@ export type CategoryWithProductCount = {
   status: string;
   createdAt: Date;
   product_count: number;
+};
+
+export type UserType = {
+  _id: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  user_role: string;
+  addresses: {
+    address_line: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+    phone: string;
+    _id: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
+
+export type AddressType = {
+  // addresses: {
+  address_line: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: string;
+  phone_number?: string;
+  _id: string;
+  // }[];
 };

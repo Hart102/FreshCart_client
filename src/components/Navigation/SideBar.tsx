@@ -1,25 +1,15 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { BiGridAlt, BiLogOut } from "react-icons/bi";
-import { Button, useDisclosure } from "@nextui-org/react";
-import { authentication_token } from "@/lib";
+import { Button } from "@nextui-org/react";
 import { FaTimes } from "react-icons/fa";
-import { ModalLayout } from "@/components/Modal";
-import ModalTemplates, {
-  changeModalContent,
-} from "@/components/Modal/Complete-modal-templates";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
-
-const checkAuthentication = (
-  token: string | undefined,
-  navigation: (to: string) => void
-) => {
-  if (token === undefined) {
-    navigation(routes.home);
-  }
-};
+import instance from "@/components/api";
+import { useDispatch } from "react-redux";
+import { openModal } from "@/redux/modal_actions";
+import { ConfirmationModal } from "@/components/Templates/index";
+import { showAlert } from "@/util/alert";
+import { ProtectedRoute } from "../api/auth";
+import { useEffect } from "react";
 
 export default function SideBar({
   status,
@@ -33,39 +23,34 @@ export default function SideBar({
   closeMenu?: () => void;
 }) {
   const location = useLocation();
-  const navigation = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  const [response, setResponse] = useState({ isError: false, message: "" });
+  const dispatch = useDispatch();
 
-  const templates = ModalTemplates({
-    onCancle: onClose,
-    onContinue: () => Logout(),
-    confirmationMessage: "Are you sure you want to logout ?",
-    response,
-  });
-  const handleChangeModalContent = (template: string) => {
-    changeModalContent({
-      template,
-      templates,
-      onOpen,
-      setCurrentTemplate,
-    });
-  };
+  useEffect(() => {
+    ProtectedRoute();
+  }, []);
+
   const Logout = async () => {
-    const { data } = await axios.post(ApiEndPoint(endpoints.logout, ""));
+    const { data } = await instance.post("/user/logout");
     if (!data.isError) {
       document.cookie =
         "online_store" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       window.location.reload();
     } else {
-      setResponse({ isError: data.isError, message: data.message });
+      showAlert("Error", data?.message, "error");
     }
   };
 
-  useEffect(() => {
-    checkAuthentication(authentication_token, navigation);
-  }, [navigation]);
+  const handleOpenModal = () => {
+    dispatch(
+      openModal(
+        <ConfirmationModal
+          onContinue={Logout}
+          message="Are you sure you want to logout ?"
+        />,
+        "md"
+      )
+    );
+  };
 
   return (
     <>
@@ -121,7 +106,7 @@ export default function SideBar({
             <div className="border-b border-dotted bg-dark-gray-200 py-1 rounded"></div>
             <div className="py-10">
               <Button
-                onClick={() => handleChangeModalContent("02")}
+                onClick={handleOpenModal}
                 className="flex items-center gap-2 rounded-lg border hover:border-deep-blue-100"
               >
                 <BiLogOut />
@@ -131,9 +116,6 @@ export default function SideBar({
           </div>
         </div>
       </aside>
-      <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout>
     </>
   );
 }

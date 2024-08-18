@@ -1,12 +1,9 @@
 import { Link } from "react-router-dom";
 import { Image } from "@nextui-org/react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaTwitter, FaFacebook, FaInstagram } from "react-icons/fa";
 import { CategoryWithProductCount } from "@/types/index";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
-
 import amazonImg from "@/assets/payment/amazonpay.svg";
 import americanExpress from "@/assets/payment/american-express.svg";
 import masterCard from "@/assets/payment/mastercard.svg";
@@ -14,6 +11,7 @@ import payPal from "@/assets/payment/paypal.svg";
 import visa from "@/assets/payment/visa.svg";
 import appStore from "@/assets/appbutton/appstore-btn.svg";
 import googlePlay from "@/assets/appbutton/googleplay-btn.svg";
+import { fetchCategories } from "@/components/api/products";
 
 const about = [
   { href: "#", title: "About" },
@@ -51,11 +49,9 @@ export default function Footer() {
 
   useEffect(() => {
     const FetchCategories = async () => {
-      const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_all_categories, "")
-      );
-      if (!data.isError) {
-        setCategories(data.payload);
+      const response = await fetchCategories();
+      if (!response.isError) {
+        setCategories(response.payload);
       }
     };
     FetchCategories();
