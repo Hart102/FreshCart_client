@@ -1,20 +1,25 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Image, Spinner } from "@nextui-org/react";
+import { Button, Image } from "@nextui-org/react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import { BiCloudUpload } from "react-icons/bi";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { ProductSchema } from "@/schema/addProductSchema";
-import { imageUrl } from "@/lib";
+import { authentication_token, imageUrl } from "@/lib";
 import { CategoryWithProductCount, ProductType } from "@/types/index";
-import instance, { token, api } from "@/api";
-import { showAlert } from "@/util/alert";
+import { ApiEndPoint, endpoints } from "@/routes/api";
+import { fetchProductById, fetchCategories } from "@/components/api/products";
+
+import { openModal } from "@/redux/modal_actions";
+import { ResponseModal, Loader } from "@/components/Templates/index";
 
 export default function AddProduct() {
+  // const location = useLocation();
   const params = useParams();
+  const dispatch = useDispatch();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [productImages, setproductImages] = useState<string[]>([]);
@@ -28,7 +33,7 @@ export default function AddProduct() {
   console.log(selectedProduct);
 
   const FetchCategories = async () => {
-    const { data } = await instance.get("/categories/fetch-all-categorie");
+    const data = await fetchCategories();
     if (!data.isError) {
       setCategories(data.payload);
     }
@@ -36,12 +41,11 @@ export default function AddProduct() {
 
   const fetctSelectedProduct = async () => {
     if (params?.id !== "create") {
-      const { data } = await instance.get(`/products/${params.id}`);
-      setSelectedProduct(data.payload.product);
+      const response = await fetchProductById(params.id);
+      const data = response.payload.product;
+      setSelectedProduct(data);
 
-      const { name, price, quantity, status, description, images } =
-        data.payload.product;
-
+      const { name, price, quantity, status, description, images } = data;
       setValue("productName", name);
       setValue("category", data?.category_name);
       setValue("price", price.slice(3));
@@ -93,10 +97,13 @@ export default function AddProduct() {
     }
   };
 
-  const endpoint = params.id == "create" ? "products/create" : "products/edit";
+  const endpoint =
+    params.id == "create"
+      ? ApiEndPoint(endpoints.create_product, "")
+      : ApiEndPoint(endpoints.edit_product, "");
 
   const handleApiRequest = async (data: ProductSchema) => {
-    setIsLoading(true);
+    dispatch(openModal(<Loader />, "1xl"));
 
     const price = params.id !== "create" ? `NGN ${data.price}` : data.price;
     const category =
@@ -120,15 +127,20 @@ export default function AddProduct() {
     }
 
     try {
-      const request = await axios.put(`${api}/${endpoint}`, formData, {
-        headers: { Authorization: token },
+      const request = await axios.put(endpoint, formData, {
+        headers: { Authorization: authentication_token },
       });
       const response = await request.data;
-      setIsLoading(false);
-      if (response?.isError) {
-        showAlert("Error", response?.message, "error");
-      } else {
-        showAlert("Success", response?.message, "success");
+      dispatch(
+        openModal(
+          <ResponseModal
+            isError={response.isError}
+            message={response?.message}
+          />,
+          "1xl"
+        )
+      );
+      if (!response.isError) {
         reset();
         setFiles([]);
         setPreviewImages([]);
@@ -269,19 +281,9 @@ export default function AddProduct() {
             </div>
             <Button
               onClick={handleSubmit(onSubmit)}
-              disabled={isLoading}
               className="bg-deep-blue-100 text-white py-2 px-3 rounded font-semibold text-sm hover:opacity-65"
             >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <Spinner size="sm" color="white" />
-                  <p>Loading...</p>
-                </div>
-              ) : params.id == "create" ? (
-                "CREATE PRODUCT"
-              ) : (
-                "EDIT PRODUCT"
-              )}
+              {params.id == "create" ? "CREATE PRODUCT" : "EDIT PRODUCT"}
             </Button>
           </div>
         </form>

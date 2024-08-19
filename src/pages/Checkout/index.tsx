@@ -8,11 +8,11 @@ import { useForm } from "react-hook-form";
 import { debitCardSchema } from "@/schema/DebitCardSchema";
 import { imageUrl } from "@/lib";
 import { routes } from "@/routes/route";
-import { ProtectedRoute } from "@/components/api/auth";
+import { ProtectedRoute } from "@/api/auth";
 import AddAddress from "@/components/Create-address";
 import { openModal } from "@/redux/modal_actions";
 import { useDispatch } from "react-redux";
-import instance from "@/components/api";
+import instance from "@/api";
 import { showAlert } from "@/util/alert";
 
 export default function Shiipping() {

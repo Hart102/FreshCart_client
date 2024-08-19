@@ -5,8 +5,8 @@ import { BiShoppingBag, BiStar } from "react-icons/bi";
 import { getCartCount, imageUrl, setCartCount } from "@/lib";
 import { ProductType } from "@/types/index";
 import { routes } from "@/routes/route";
-import instance from "../api";
-import { ProtectedRoute } from "../api/auth";
+import instance from "../../api";
+import { ProtectedRoute } from "../../api/auth";
 
 export default function ProductTemplate({ product }: { product: ProductType }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);

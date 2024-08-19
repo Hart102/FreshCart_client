@@ -14,7 +14,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@nextui-org/react";
 import { routes } from "@/routes/route";
 import ModalLayout from "@/components/Modal_layout";
-import instance from "@/components/api";
+import instance from "@/api";
 import { showAlert } from "@/util/alert";
 
 

@@ -4,10 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "@/schema/register_login_schema";
-import { authentication_token } from "@/lib";
 import { routes } from "@/routes/route";
 import { showAlert } from "@/util/alert";
-import instance from "@/components/api";
+import instance, { token } from "@/api";
 
 interface CookieOptions {
   name: string;
@@ -55,7 +54,7 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (authentication_token !== undefined) return navigation(routes.home);
+    if (token !== undefined) return navigation(routes.home);
   }, [navigation]);
 
   const InputProps = {

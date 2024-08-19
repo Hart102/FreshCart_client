@@ -5,22 +5,26 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  Spinner,
 } from "@nextui-org/react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaAngleDown, FaSearch, FaTimes } from "react-icons/fa";
 import { BiGridAlt, BiShoppingBag } from "react-icons/bi";
 import { FaBars } from "react-icons/fa6";
-import { authentication_token, getCartCount } from "@/lib";
+import { getCartCount } from "@/lib";
+import { token } from "../../api/auth";
 import { CategoryWithProductCount } from "@/types/index";
 import { routes } from "@/routes/route";
-import instance from "@/components/api/index";
+import instance from "@/api/index";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
-import { ConfirmationModal, ResponseModal } from "@/components/Templates/index";
+import { ConfirmationModal } from "@/components/Templates/index";
+import { showAlert } from "@/util/alert";
 
 export default function Navbar() {
   const navigation = useNavigate();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isMenuOpen, setIsOpen] = useState<boolean>(false);
   const [userRole, setUserRole] = useState<string>("");
   const [cartCount, setCartCount] = useState<string | number>();
@@ -39,7 +43,7 @@ export default function Navbar() {
   };
 
   const fetchUserRole = async () => {
-    if (authentication_token) {
+    if (token) {
       const { data } = await instance.get("/user/fetch-user-role");
 
       if (!data.isError) {
@@ -55,18 +59,16 @@ export default function Navbar() {
         "online_store" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       window.location.reload();
     } else {
-      dispatch(
-        openModal(
-          <ResponseModal isError={data.isError} message={data.message} />,
-          "1xl"
-        )
-      );
+      showAlert("Error", data?.message, "error");
     }
   };
 
   useEffect(() => {
     const FetchCategories = async () => {
+      setIsLoading(true);
       const { data } = await instance.get("/categories/fetch-all-categorie");
+
+      setIsLoading(false);
       if (!data.isError) {
         setCategories(data.payload);
       }
@@ -125,19 +127,21 @@ export default function Navbar() {
             </div>
           </div>
           <div className="w-full md:w-11/12 mx-auto md:px-14 px-5 hidden md:flex gap-8 items-center pb-2">
-            <Dropdown>
+            <Dropdown className="shadow-none">
               <DropdownTrigger>
                 <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">
                   <BiGridAlt size={23} />
                   All Departments
                 </Button>
               </DropdownTrigger>
-              {categories && categories.length > 0 && (
-                <DropdownMenu
-                  aria-label="Static Actions"
-                  className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
-                >
-                  {categories.map((category) => (
+              <DropdownMenu
+                aria-label="Static Actions"
+                className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
+              >
+                {isLoading ? (
+                  <Spinner size="sm" className="text-center" />
+                ) : (
+                  categories.map((category) => (
                     <DropdownItem
                       key={category._id}
                       onClick={() => {
@@ -149,9 +153,9 @@ export default function Navbar() {
                     >
                       {category.name}
                     </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              )}
+                  ))
+                )}
+              </DropdownMenu>
             </Dropdown>
             <Dropdown>
               <DropdownTrigger>
@@ -167,7 +171,7 @@ export default function Navbar() {
                 <DropdownItem
                   onClick={() => navigation(routes.login)}
                   className={`${dropDownClass} ${
-                    authentication_token == undefined ? "block" : "hidden"
+                    token == undefined ? "block" : "hidden"
                   }`}
                 >
                   Signin
@@ -175,7 +179,7 @@ export default function Navbar() {
                 <DropdownItem
                   onPress={confirmLogout}
                   className={`${dropDownClass} ${
-                    authentication_token !== undefined ? "block" : "hidden"
+                    token !== undefined ? "block" : "hidden"
                   }`}
                 >
                   Logout
@@ -183,7 +187,7 @@ export default function Navbar() {
                 <DropdownItem
                   onClick={() => navigation(routes.register)}
                   className={`${dropDownClass} ${
-                    authentication_token == undefined ? "block" : "hidden"
+                    token == undefined ? "block" : "hidden"
                   }`}
                 >
                   Signup
@@ -191,7 +195,7 @@ export default function Navbar() {
                 <DropdownItem
                   onClick={() => navigation(routes.user_profile)}
                   className={`${
-                    userRole == "admin" || authentication_token == undefined
+                    userRole == "admin" || token == undefined
                       ? "hidden"
                       : "block"
                   }`}
@@ -231,30 +235,18 @@ export default function Navbar() {
                   <FaAngleDown />
                 </div>
                 <ul className="[&_li]:px-4 [&_li]:py-2 [&_li]:text-dark-gray-100 [&_li]:hover:text-deep-blue-100">
-                  <li
-                    className={
-                      authentication_token == undefined ? "block" : "hidden"
-                    }
-                  >
+                  <li className={token == undefined ? "block" : "hidden"}>
                     <Link to={routes.login}>Signin</Link>
                   </li>
-                  <li
-                    className={
-                      authentication_token == undefined ? "block" : "hidden"
-                    }
-                  >
+                  <li className={token == undefined ? "block" : "hidden"}>
                     <Link to={routes.register}>Signup</Link>
                   </li>
-                  <li
-                    className={
-                      authentication_token !== undefined ? "block" : "hidden"
-                    }
-                  >
+                  <li className={token !== undefined ? "block" : "hidden"}>
                     <Link to={routes.register}>Logout</Link>
                   </li>
                   <li
                     className={`${
-                      userRole == "admin" || authentication_token == undefined
+                      userRole == "admin" || token == undefined
                         ? "hidden"
                         : "block"
                     }`}

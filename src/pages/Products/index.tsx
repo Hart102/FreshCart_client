@@ -19,13 +19,10 @@ import { BiAddToQueue } from "react-icons/bi";
 import { imageUrl, divideAndInsertBr } from "@/lib";
 import { ProductType } from "@/types/index";
 import { routes } from "@/routes/route";
-import { fetchAllProducts, deleteProduct } from "@/components/api/products";
-import { openModal } from "@/redux/modal_actions";
-import {
-  Loader,
-  ConfirmationModal,
-  ResponseModal,
-} from "@/components/Templates/index";
+import { closeModal, openModal } from "@/redux/modal_actions";
+import { ConfirmationModal } from "@/components/Templates/index";
+import { showAlert } from "@/util/alert";
+import instance from "@/api";
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -37,10 +34,10 @@ export default function Products() {
 
   const FetchProducts = async () => {
     setIsLoading(true);
-    const response = await fetchAllProducts();
+    const { data } = await instance.get("/products");
     setIsLoading(false);
-    if (!response.isError) {
-      setProducts(response.payload);
+    if (!data.isError) {
+      setProducts(data.payload);
     }
   };
 
@@ -59,22 +56,19 @@ export default function Products() {
   }, [products, query]);
 
   const DeleteProduct = async () => {
-    dispatch(openModal(<Loader />, "1xl"));
-    const response = await deleteProduct(products[index]._id);
-    dispatch(
-      openModal(
-        <ResponseModal
-          isError={response?.isError}
-          message={response?.message}
-        />,
-        "1xl"
-      )
+    const { data } = await instance.delete(
+      `/products/delete/${products[index]._id}`
     );
-    if (!response.isError) {
+    dispatch(closeModal());
+    if (data?.isError) {
+      showAlert("Error", data?.message, "error");
+    } else {
+      showAlert("Success", data?.message, "success");
       products.splice(index, 1);
       setProducts([...products]);
     }
   };
+
   const OpenDeleteProductModal = (index: number) => {
     setIndex(index);
     dispatch(
@@ -116,7 +110,6 @@ export default function Products() {
             </Link>
           </div>
         </div>
-
         <Table
           classNames={{
             base: "overflow-x-scroll md:overflow-x-auto",
@@ -172,7 +165,7 @@ export default function Products() {
                   <TableCell>{product?.category_name}</TableCell>
                   <TableCell
                     className={
-                      product?.status == "active"
+                      product?.status.toLowerCase() == "available"
                         ? "text-deep-blue-100"
                         : "text-deep-red-100"
                     }

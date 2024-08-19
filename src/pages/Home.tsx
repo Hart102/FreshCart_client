@@ -1,20 +1,21 @@
-import { ApiEndPoint, endpoints } from "@/routes/api";
-import { Button } from "@nextui-org/react";
-import axios from "axios";
+import { Button, Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { ProductType } from "@/types";
 import ProductTemplate from "@/components/ProductTemplate";
+import instance from "@/api";
+
 // import AliceCarousel from "react-alice-carousel";
 // import "react-alice-carousel/lib/alice-carousel.css";
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<ProductType[]>([]);
 
   const handleApiCalls = async () => {
+    setIsLoading(true);
     const product_container = [];
-    const { data } = await axios.get(
-      ApiEndPoint(endpoints.fetch_all_products, "")
-    );
+    const { data } = await instance.get("/products");
+    setIsLoading(false);
     if (!data.isError) {
       if (data.payload.length < 8) {
         setProducts(data.payload);
@@ -83,13 +84,23 @@ export default function Home() {
       </div> */}
       <div className="flex flex-col gap-8 py-10">
         <h2 className="text-2xl font-semibold">Popular Products</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10 text-dark-gray-100">
-          {products &&
-            products.length > 0 &&
-            products?.map((product) => (
-              <ProductTemplate key={product?._id} product={product} />
-            ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <Spinner size="md" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10 text-dark-gray-100">
+            {products &&
+              products.length > 0 &&
+              products
+                .filter(
+                  (product) => product.status.toLowerCase() !== "out of stock"
+                )
+                .map((product) => (
+                  <ProductTemplate key={product?._id} product={product} />
+                ))}
+          </div>
+        )}
       </div>
     </div>
   );

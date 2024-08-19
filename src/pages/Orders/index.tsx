@@ -11,30 +11,23 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  // useDisclosure,
 } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { authentication_token, imageUrl, dateOptions } from "@/lib";
-// import { ModalLayout } from "@/components/Modal";
-// import ModalTemplates, {
-//   changeModalContent,
-// } from "@/components/Modal/Complete-modal-templates";
+import { imageUrl, dateOptions } from "@/lib";
 import { OrderType } from "@/types/index";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "@/api";
+import { useDispatch } from "react-redux";
+import { closeModal, openModal } from "@/redux/modal_actions";
+import { ConfirmationModal } from "@/components/Templates";
+import { showAlert } from "@/util/alert";
 
 export default function Orders() {
   const navigation = useNavigate();
-  // const { isOpen, onOpen, onClose } = useDisclosure();
+  const dispatch = useDispatch();
   const [orders, setOrders] = useState<OrderType[]>([]);
-  // const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  // const [response, setResponse] = useState({ isError: false, message: "" });
   const [searchString, setSearchString] = useState<string>("");
-  const [index, setIndex] = useState<number>(0);
-
-  console.log(index);
 
   const searchResult = useMemo(() => {
     if (orders.length > 0) {
@@ -60,58 +53,36 @@ export default function Orders() {
   }, []);
 
   const FetchOrders = async () => {
-    const { data } = await axios.get(
-      ApiEndPoint(endpoints.fetch_all_orders, ""),
-      {
-        headers: { Authorization: authentication_token },
-      }
-    );
-    if (data.isError) {
-      // setResponse({ isError: data.isError, message: data.message });
-      // handleChangeModalContent("03");
-    } else {
+    const { data } = await instance.get("/transactions/fetch-all-orders");
+    if (!data.isError) {
       setOrders(data.payload);
     }
   };
 
-  // const DeleteOrder = async () => {
-  //   // handleChangeModalContent("01");
-  //   const { data } = await axios.delete(
-  //     ApiEndPoint(endpoints.delete_order, `${orders[index].id}`),
-  //     {
-  //       headers: { Authorization: authentication_token },
-  //     }
-  //   );
-  //   if (data.error) {
-  //     setResponse({ isError: true, message: data.error });
-  //     // handleChangeModalContent("03");
-  //   } else {
-  //     orders.splice(index, 1);
-  //     setOrders([...orders]);
-  //     setResponse({ isError: false, message: data.message });
-  //     // handleChangeModalContent("03");
-  //   }
-  // };
-
-  // const templates = ModalTemplates({
-  //   onCancle: onClose,
-  //   onContinue: () => DeleteOrder(),
-  //   confirmationMessage: "Are you sure you want to delete this ?",
-  //   response,
-  // });
-
-  // const handleChangeModalContent = (template: string) => {
-  //   changeModalContent({
-  //     template,
-  //     templates,
-  //     onOpen,
-  //     setCurrentTemplate,
-  //   });
-  // };
+  const DeleteOrder = async (index: number) => {
+    const { data } = await instance.delete(
+      `/transactions/delete-order/${orders[index]._id}`
+    );
+    dispatch(closeModal());
+    if (data.error) {
+      showAlert("Error", data?.message, "error");
+    } else {
+      orders.splice(index, 1);
+      setOrders([...orders]);
+      showAlert("Success", data?.message, "success");
+    }
+  };
 
   const openDeleteModal = (index: number) => {
-    setIndex(index);
-    // handleChangeModalContent("02");
+    dispatch(
+      openModal(
+        <ConfirmationModal
+          onContinue={() => DeleteOrder(index)}
+          message="Are you sure you want to delete this ?"
+        />,
+        "md"
+      )
+    );
   };
   const ViewOrder = (id: string) =>
     navigation(routes.dashboard_single_order, { state: id });
@@ -155,7 +126,7 @@ export default function Orders() {
             <TableBody>
               {searchResult.map((order, index) => (
                 <TableRow
-                  key={order?.id}
+                  key={order?._id}
                   className={`hover:bg-deep-gray-50 cursor-pointer ${
                     index % 2 == 0 ? "bg-white" : "bg-deep-gray-200"
                   }`}
@@ -197,7 +168,7 @@ export default function Orders() {
                       >
                         <DropdownItem
                           className="py-1 my-1 rounded text-deep-green-100 hover:bg-deep-blue-100 hover:text-white"
-                          onClick={() => ViewOrder(order?.id)}
+                          onClick={() => ViewOrder(order?._id)}
                         >
                           View
                         </DropdownItem>
@@ -218,9 +189,6 @@ export default function Orders() {
           )}
         </Table>
       </div>
-      {/* <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout> */}
     </>
   );
 }

@@ -2,7 +2,7 @@ import { Button, Input, Spinner } from "@nextui-org/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { addAddressSchema } from "@/schema/addressSchema";
-import instance from "../api";
+import instance from "../../api";
 import { showAlert } from "@/util/alert";
 import { useState } from "react";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AddressType } from "@/types/index";
-import instance from "@/components/api";
+import instance from "@/api";
 
 export default function Profile() {
   const [user, setUser] = useState<AddressType>();

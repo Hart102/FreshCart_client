@@ -3,12 +3,12 @@ import { BiGridAlt, BiLogOut } from "react-icons/bi";
 import { Button } from "@nextui-org/react";
 import { FaTimes } from "react-icons/fa";
 import { routes } from "@/routes/route";
-import instance from "@/components/api";
+import instance from "@/api";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
 import { ConfirmationModal } from "@/components/Templates/index";
 import { showAlert } from "@/util/alert";
-import { ProtectedRoute } from "../api/auth";
+import { ProtectedRoute } from "../../api/auth";
 import { useEffect } from "react";
 
 export default function SideBar({

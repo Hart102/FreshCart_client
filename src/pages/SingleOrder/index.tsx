@@ -8,16 +8,11 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  // useDisclosure,
 } from "@nextui-org/react";
-import axios from "axios";
-import { authentication_token, dateOptions, imageUrl } from "@/lib";
+import { dateOptions, imageUrl } from "@/lib";
 import { CustomerOrderType } from "@/types/index";
-// import { ModalLayout } from "@/components/Modal";
-// import ModalTemplates, {
-//   changeModalContent,
-// } from "@/components/Modal/Complete-modal-templates";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "@/api";
+import { showAlert } from "@/util/alert";
 
 export type ModalTemplateType = {
   [key: string]: JSX.Element;
@@ -27,38 +22,28 @@ export type ModalTemplateType = {
 export default function SingleOrder() {
   const location = useLocation();
   const navigation = useNavigate();
-  // const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  // const [response, setResponse] = useState({ isError: false, message: "" });
   const [orderDetails, setOrderDetails] = useState<CustomerOrderType>();
   const [orders, setOrders] = useState<CustomerOrderType[]>([]);
 
   const FetchData = useCallback(async () => {
-    const { data } = await axios.get(
-      ApiEndPoint(
-        endpoints.fetch_customer_and_order_using_orderId,
-        location.state
-      ),
-      { headers: { Authorization: authentication_token } }
+    const { data } = await instance.get(
+      `/transactions/fetch-customer-and-orderDetails/${location.state}`
     );
-    // console.log(data);
     if (!data.isError) {
       setOrderDetails(data.payload);
-      const request = await axios.post(
-        ApiEndPoint(endpoints.fetch_order_products, ""),
+      const request = await instance.post(
+        "/transactions/fetch-order-and-products",
         {
           userId: data.payload.user_id,
           orderId: data.payload.transaction_reference,
-        },
-        { headers: { Authorization: authentication_token } }
+        }
       );
       const response = await request.data;
       setOrders(response.payload);
     } else {
-      // setResponse({ isError: data.isError, message: data.message });
-      // handleChangeModalContent("03");
+      showAlert("Error", data?.message, "error");
     }
-  }, [location.state, navigation]);
+  }, [location.state]);
 
   const totalPrice = () => {
     let total = 0;
@@ -69,22 +54,6 @@ export default function SingleOrder() {
     return total;
   };
   const grandTotal = `NGN ${totalPrice()}`;
-
-  // const templates = ModalTemplates({
-  //   onCancle: onClose,
-  //   onContinue: () => console.log("clicked"),
-  //   confirmationMessage: "",
-  //   response,
-  // });
-  // const handleChangeModalContent = (template: string) => {
-  //   changeModalContent({
-  //     template,
-  //     templates,
-  //     onOpen,
-  //     setCurrentTemplate,
-  //   });
-  // };
-
   useEffect(() => {
     if (location.state == null) {
       navigation("/");
@@ -220,9 +189,6 @@ export default function SingleOrder() {
           </>
         )}
       </div>
-      {/* <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout> */}
     </>
   );
 }

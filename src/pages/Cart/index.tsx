@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ProductType } from "@/types/index";
 import { imageUrl, setCartCount } from "@/lib";
 import { routes } from "@/routes/route";
-import instance from "@/components/api";
+import instance from "@/api";
 
 export default function CheckoutSummary() {
   const navigation = useNavigate();

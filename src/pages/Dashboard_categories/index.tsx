@@ -10,19 +10,16 @@ import {
   TableHeader,
   TableRow,
   Button,
-  Input,
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { BiAddToQueue } from "react-icons/bi";
-// import { ModalLayout } from "@/components/Modal";
-// import ModalTemplates, {
-//   changeModalContent,
-// } from "@/components/Modal/Complete-modal-templates";
-import { authentication_token } from "@/lib";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "@/api";
+import { closeModal, openModal } from "@/redux/modal_actions";
+import { useDispatch } from "react-redux";
+import { ConfirmationModal } from "@/components/Templates";
+import { showAlert } from "@/util/alert";
 
 type CategoryWithProductCount = {
   _id: number;
@@ -34,25 +31,13 @@ type CategoryWithProductCount = {
 
 export default function Categories() {
   const navigation = useNavigate();
-  // const { isOpen, onOpen, onClose } = useDisclosure();
+  const dispatch = useDispatch();
   const [categorie, setCategories] = useState<CategoryWithProductCount[]>([]);
   const [query, setQuery] = useState<string>("");
-  // const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  // const [response, setResponse] = useState({ isError: false, message: "" });
-  const [index, setIndex] = useState<number>(0);
-  console.log(index);
 
   const FetchCategories = async () => {
-    const { data } = await axios.get(
-      ApiEndPoint(endpoints.fetch_all_categories, ""),
-      {
-        headers: { Authorization: authentication_token },
-      }
-    );
-    if (data.isError) {
-      // setResponse({ isError: data.isError, message: data.message });
-      // handleChangeModalContent("03");
-    } else {
+    const { data } = await instance.get("/categories/fetch-all-categorie");
+    if (!data.isError) {
       setCategories(data.payload);
     }
   };
@@ -67,43 +52,31 @@ export default function Categories() {
     FetchCategories();
   }, []);
 
-  // const templates = ModalTemplates({
-  //   onCancle: onClose,
-  //   onContinue: () => DeleteCategory(),
-  //   confirmationMessage: "Are you sure you want to delete this ?",
-  //   response,
-  // });
-
-  // const handleChangeModalContent = (template: string) => {
-  //   changeModalContent({
-  //     template,
-  //     templates,
-  //     onOpen,
-  //     setCurrentTemplate,
-  //   });
-  // };
-  const handleOpenModalForDeletingOfItems = (index: number) => {
-    setIndex(index);
-    // handleChangeModalContent("02");
+  const DeleteCategory = async (index: number) => {
+    const { data } = await instance.delete(
+      `/categories/delete/${categorie[index]?._id}`
+    );
+    dispatch(closeModal());
+    if (data.isError) {
+      showAlert("Error", data?.message, "error");
+    } else {
+      showAlert("Success", data?.message, "success");
+      categorie.splice(index, 1);
+      setCategories([...categorie]);
+    }
   };
 
-  // const DeleteCategory = async () => {
-  //   const { data } = await axios.delete(
-  //     ApiEndPoint(endpoints.delete_category_by_id, `${categorie[index]?._id}`),
-  //     {
-  //       headers: { Authorization: authentication_token },
-  //     }
-  //   );
-  //   if (data.isError) {
-  //     // setResponse({ isError: data.isError, message: data.message });
-  //     // handleChangeModalContent("03");
-  //   } else {
-  //     // setResponse({ isError: data.isError, message: data.message });
-  //     // handleChangeModalContent("03");
-  //     categorie.splice(index, 1);
-  //     setCategories([...categorie]);
-  //   }
-  // };
+  const handleOpenModalForDeletingOfItems = (index: number) => {
+    dispatch(
+      openModal(
+        <ConfirmationModal
+          onContinue={() => DeleteCategory(index)}
+          message="Are you sure you want to delete this ?"
+        />,
+        "md"
+      )
+    );
+  };
 
   const EditCategory = (category: CategoryWithProductCount) =>
     navigation(`${routes.dashboard_create_edit_category}/edit`, {
@@ -115,21 +88,14 @@ export default function Categories() {
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between px-4">
-            <form className="flex w-1/2 items-center gap-2 border rounded-lg px-2">
-              <Input
-                size="sm"
-                type="search"
-                placeholder="Search category by name"
-                classNames={{
-                  base: "h-10 text-sm outline-0",
-                  mainWrapper: "h-full",
-                  input: "text-small",
-                  inputWrapper: "h-full font-normal hover:border-0",
-                }}
-                style={{ outline: "0" }}
-                onValueChange={setQuery}
-              />
-            </form>
+            <input
+              type="search"
+              placeholder="Type to search..."
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setQuery(e.target.value)
+              }
+              className="w-full md:w-1/2 text-sm outline-none border rounded bg-transparent p-2"
+            />
             <Button
               onClick={() =>
                 navigation(`${routes.dashboard_create_edit_category}/create`)
@@ -140,7 +106,6 @@ export default function Categories() {
               <p className="text-sm">ADD CATEGORY</p>
             </Button>
           </div>
-
           <Table
             classNames={{
               base: "text-center overflow-x-scroll md:overflow-x-auto",
@@ -220,9 +185,6 @@ export default function Categories() {
           </Table>
         </div>
       </div>
-      {/* <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout> */}
     </>
   );
 }

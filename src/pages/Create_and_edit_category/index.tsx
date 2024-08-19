@@ -1,37 +1,16 @@
-import { useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button, Spinner } from "@nextui-org/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { addCategorySchema } from "@/schema/addCategorySchema";
-// import { ModalLayout } from "@/components/Modal";
-// import ModalTemplates, {
-//   changeModalContent,
-// } from "@/components/Modal/Complete-modal-templates";
-import { authentication_token } from "@/lib";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "@/api";
+import { showAlert } from "@/util/alert";
 
 export default function EditAndEditCategory() {
   const location = useLocation();
-  // const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [currentTemplate, setCurrentTemplate] = useState<string>("");
-  // const [response, setResponse] = useState({ isError: false, message: "" });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // const templates = ModalTemplates({
-  //   onCancle: onClose,
-  //   onContinue: () => console.log("add category page"),
-  //   confirmationMessage: "",
-  //   response,
-  // });
-  // const handleChangeModalContent = (template: string) => {
-  //   changeModalContent({
-  //     template,
-  //     templates,
-  //     onOpen,
-  //     setCurrentTemplate,
-  //   });
-  // };
   const {
     register,
     handleSubmit,
@@ -45,6 +24,7 @@ export default function EditAndEditCategory() {
       status: location.state?.status || "active",
     },
   });
+
   useEffect(() => {
     if (location.state !== null) {
       const { name, status } = location.state;
@@ -55,24 +35,23 @@ export default function EditAndEditCategory() {
 
   const endpoint =
     location.state == null
-      ? ApiEndPoint(endpoints.create_categories, "")
-      : ApiEndPoint(endpoints.edit_category_using_id, location.state._id);
+      ? "categories/create"
+      : `categories/edit/${location.state._id}`;
 
   const handleApiRequest = async (data: addCategorySchema) => {
-    // handleChangeModalContent("01");
-    const request = await axios.post(endpoint, data, {
-      headers: { Authorization: authentication_token },
-    });
+    setIsLoading(true);
+    const request = await instance.post(endpoint, data);
     const response = request.data;
+    setIsLoading(false);
+
     if (response.isError) {
-      // setResponse({ isError: response.isError, message: response.message });
-      // handleChangeModalContent("03");
+      showAlert("Error", response.message, "error");
     } else {
       reset();
-      // setResponse({ isError: response.isError, message: response.message });
-      // handleChangeModalContent("03");
+      showAlert("Success", response.message, "success");
     }
   };
+
   const onSubmit = async (data: addCategorySchema) => {
     handleApiRequest(data);
   };
@@ -80,7 +59,7 @@ export default function EditAndEditCategory() {
   return (
     <>
       <form className="min-h-[80vh] flex1 items-center text-dark-gray-100 [&_span]:text-deep-red-100 [&_span]:text-xs">
-        <div className="w-full md:w-7/12 mx-auto1 flex flex-col gap-4 rounded-lg py-10 px-5 text-sm">
+        <div className="w-full md:w-7/12 mx-auto1 flex flex-col gap-8 rounded-lg py-10 px-5 text-sm">
           <h1 className="text-2xl font-semibold">Create Products Category</h1>
           <Input
             placeholder="Category Name"
@@ -92,7 +71,7 @@ export default function EditAndEditCategory() {
           />
           {errors?.name?.message && <span>{errors?.name?.message}</span>}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <div className="flex gap-2 items-center">
               <input
                 type="radio"
@@ -116,17 +95,22 @@ export default function EditAndEditCategory() {
           <div>
             <Button
               onClick={handleSubmit(onSubmit)}
-              className="w-full md:w-1/2 rounded-lg font-semibold
-               border border-deep-blue-100 hover:bg-deep-blue-100 hover:text-white"
+              disabled={isLoading}
+              className={`w-full md:w-1/2 rounded-lg font-semibold
+              bg-deep-blue-100 text-white ${isLoading && "opacity-65"}`}
             >
-              CREATE
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner color="white" size="sm" />
+                  <span>Please wait...</span>
+                </div>
+              ) : (
+                "CREATE CATEGORY"
+              )}
             </Button>
           </div>
         </div>
       </form>
-      {/* <ModalLayout isOpen={isOpen} onClose={onClose}>
-        {templates[currentTemplate]}
-      </ModalLayout> */}
     </>
   );
 }

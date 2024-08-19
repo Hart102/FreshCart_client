@@ -6,8 +6,8 @@ import { ProductType } from "@/types/index";
 import ProductTemplate from "@/components/ProductTemplate";
 import { routes } from "@/routes/route";
 import { imageUrl, setCartCount, getCartCount } from "@/lib";
-import instance from "@/components/api";
-import { ProtectedRoute } from "@/components/api/auth";
+import instance from "@/api";
+import { ProtectedRoute } from "@/api/auth";
 
 export default function SingleProduct() {
   const location = useLocation();

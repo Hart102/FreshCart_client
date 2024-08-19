@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { FaAngleRight } from "react-icons/fa";
@@ -6,7 +5,7 @@ import { BiGridAlt, BiGrid, BiMenu } from "react-icons/bi";
 import ProductTemplate from "@/components/ProductTemplate";
 import { ProductType, CategoryWithProductCount } from "@/types/index";
 import { routes } from "@/routes/route";
-import { ApiEndPoint, endpoints } from "@/routes/api";
+import instance from "@/api";
 
 export default function Categories() {
   const params = useParams();
@@ -22,8 +21,8 @@ export default function Categories() {
   };
 
   const FetchProductsByCategory = useMemo(async () => {
-    const { data } = await axios.get(
-      ApiEndPoint(endpoints.fetch_related_products, `${params.category}`)
+    const { data } = await instance.get(
+      `/products/category/${params.category}`
     );
     if (!data.isError) {
       return setProduct(data.payload);
@@ -33,9 +32,7 @@ export default function Categories() {
 
   useEffect(() => {
     const FetchCategoryList = async () => {
-      const { data } = await axios.get(
-        ApiEndPoint(endpoints.fetch_all_categories, "")
-      );
+      const { data } = await instance.get("/categories/fetch-all-categorie");
       if (!data.isError) {
         setCategories(data.payload);
       }

@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { imageUrl, dateOptions } from "@/lib";
 import { OrderType } from "@/types/index";
 import { routes } from "@/routes/route";
-import instance from "@/components/api";
+import instance from "@/api";
 import { showAlert } from "@/util/alert";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
