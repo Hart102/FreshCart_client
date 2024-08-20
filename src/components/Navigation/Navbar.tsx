@@ -5,10 +5,9 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-  Spinner,
 } from "@nextui-org/react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaAngleDown, FaSearch, FaTimes } from "react-icons/fa";
+import { FaSearch, FaTimes } from "react-icons/fa";
 import { BiGridAlt, BiShoppingBag } from "react-icons/bi";
 import { FaBars } from "react-icons/fa6";
 import { getCartCount } from "@/lib";
@@ -24,7 +23,6 @@ import { showAlert } from "@/util/alert";
 export default function Navbar() {
   const navigation = useNavigate();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isMenuOpen, setIsOpen] = useState<boolean>(false);
   const [userRole, setUserRole] = useState<string>("");
   const [cartCount, setCartCount] = useState<string | number>();
@@ -65,10 +63,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const FetchCategories = async () => {
-      setIsLoading(true);
       const { data } = await instance.get("/categories/fetch-all-categorie");
 
-      setIsLoading(false);
       if (!data.isError) {
         setCategories(data.payload);
       }
@@ -99,7 +95,7 @@ export default function Navbar() {
                 className="font-bold text-2xl md:text-3xl flex items-center gap-2"
               >
                 <BiShoppingBag size={30} className="text-deep-blue-100" />
-                <p className="hidden md:block">Online Store</p>
+                <p className="hidden md:block">FreshCart</p>
               </Link>
               <div className="w-5/12 hidden md:flex items-center justify-between border rounded-lg px-4 bg-white">
                 <input
@@ -116,6 +112,14 @@ export default function Navbar() {
                   </span>
                   <BiShoppingBag size={23} className="text-deep-gray-100" />
                 </Link>
+                {token !== undefined && (
+                  <Button
+                    onClick={confirmLogout}
+                    className="hidden md:block bg-transparent text-deep-blue-100 py-2 hover:bg-deep-blue-100 hover:text-white self-end"
+                  >
+                    Log Out
+                  </Button>
+                )}
                 <Button
                   onClick={Toggle}
                   size="sm"
@@ -134,14 +138,12 @@ export default function Navbar() {
                   All Departments
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Static Actions"
-                className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
-              >
-                {isLoading ? (
-                  <Spinner size="sm" className="text-center" />
-                ) : (
-                  categories.map((category) => (
+              {categories && categories.length > 0 && (
+                <DropdownMenu
+                  aria-label="Static Actions"
+                  className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
+                >
+                  {categories.map((category) => (
                     <DropdownItem
                       key={category._id}
                       onClick={() => {
@@ -153,141 +155,132 @@ export default function Navbar() {
                     >
                       {category.name}
                     </DropdownItem>
-                  ))
+                  ))}
+                </DropdownMenu>
+              )}
+            </Dropdown>
+
+            {token !== undefined && (
+              <div>
+                {userRole !== "admin" && (
+                  <Link
+                    to={routes.user_profile}
+                    className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
+                  >
+                    My Account
+                  </Link>
                 )}
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button className="p-0 text-dark-gray-100 bg-transparent flex">
-                  Account
-                  <FaAngleDown />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Static Actions"
-                className="bg-white text-dark-gray-100 text-sm shadow rounded mt-3 px-2 w-[150px]"
-              >
-                <DropdownItem
-                  onClick={() => navigation(routes.login)}
-                  className={`${dropDownClass} ${
-                    token == undefined ? "block" : "hidden"
-                  }`}
+                {userRole == "admin" && (
+                  <Link
+                    to={routes.dashboard_products}
+                    className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {token == undefined && (
+              <div className="flex gap-3">
+                <Link
+                  to={routes.login}
+                  className="text-dark-gray-100 hover:text-deep-blue-100 py-2 border-r pr-3"
                 >
-                  Signin
-                </DropdownItem>
-                <DropdownItem
-                  onPress={confirmLogout}
-                  className={`${dropDownClass} ${
-                    token !== undefined ? "block" : "hidden"
-                  }`}
+                  Login
+                </Link>
+                <Link
+                  to={routes.register}
+                  className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
                 >
-                  Logout
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => navigation(routes.register)}
-                  className={`${dropDownClass} ${
-                    token == undefined ? "block" : "hidden"
-                  }`}
-                >
-                  Signup
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => navigation(routes.user_profile)}
-                  className={`${
-                    userRole == "admin" || token == undefined
-                      ? "hidden"
-                      : "block"
-                  }`}
-                >
-                  My Account
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            {userRole == "admin" && (
-              <Link to={routes.dashboard_products} className="">
-                Dashboard
-              </Link>
+                  Register
+                </Link>
+              </div>
             )}
           </div>
         </div>
-
-        {/* Mobile */}
+        {/*========================= Mobile =========================*/}
         <div
-          className={`block md:hidden w-screen h-screen absolute top-0 bg-white z-30 p-4 duration-300 delay-300 ${
+          className={`absolute top-0 left-0 duration-300 delay-300 w-[80%] min-h-[80vh] z-40 bg-white flex flex-col gap-5 ${
             !isMenuOpen ? "-translate-x-full" : "translate-x-0"
           }`}
         >
-          <div className="w-full flex flex-col gap-5">
-            <div className="flex items-center justify-end">
-              <Button size="sm" className="bg-transparent">
-                <FaTimes
-                  onClick={Toggle}
-                  size={23}
-                  className="text-deep-gray-100"
-                />
-              </Button>
-            </div>
-            <div className="flex flex-col gap-10">
-              <div>
-                <div className="flex items-center gap-1">
-                  <p>Account</p>
-                  <FaAngleDown />
+          <div className="flex justify-between items-center p-4 text-default-500">
+            <Link
+              to={routes.home}
+              onClick={Toggle}
+              className="font-bold text-2xl md:text-3xl flex items-center gap-2"
+            >
+              <BiShoppingBag size={30} className="text-deep-blue-100" />
+              <p>FreshCart</p>
+            </Link>
+            <FaTimes onClick={Toggle} />
+          </div>
+          <div className="px-5">
+            <div className="flex flex-col gap-3 capitalize text-sm">
+              {token !== undefined && (
+                <div className="flex flex-col gap-3">
+                  {userRole !== "admin" && (
+                    <Link
+                      to={routes.user_profile}
+                      onClick={Toggle}
+                      className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
+                    >
+                      My Account
+                    </Link>
+                  )}
+                  {userRole == "admin" && (
+                    <Link
+                      to={routes.dashboard_products}
+                      onClick={Toggle}
+                      className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
                 </div>
-                <ul className="[&_li]:px-4 [&_li]:py-2 [&_li]:text-dark-gray-100 [&_li]:hover:text-deep-blue-100">
-                  <li className={token == undefined ? "block" : "hidden"}>
-                    <Link to={routes.login}>Signin</Link>
-                  </li>
-                  <li className={token == undefined ? "block" : "hidden"}>
-                    <Link to={routes.register}>Signup</Link>
-                  </li>
-                  <li className={token !== undefined ? "block" : "hidden"}>
-                    <Link to={routes.register}>Logout</Link>
-                  </li>
-                  <li
-                    className={`${
-                      userRole == "admin" || token == undefined
-                        ? "hidden"
-                        : "block"
-                    }`}
+              )}
+              {categories &&
+                categories.length > 0 &&
+                categories.map((category) => (
+                  <Link
+                    to={`${routes.categories}/${category.name}`}
+                    key={category._id}
+                    onClick={Toggle}
+                    className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
                   >
-                    <Link to={routes.user_profile}>My Account</Link>
-                  </li>
-                  <li
-                    className={userRole == "admin" ? dropDownClass : "hidden"}
+                    {category.name}
+                  </Link>
+                ))}
+
+              {token == undefined && (
+                <div className="flex flex-col gap-3">
+                  <Link
+                    to={routes.login}
+                    onClick={Toggle}
+                    className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
                   >
-                    <Link to={routes.dashboard_products}>Dashboad</Link>
-                  </li>
-                </ul>
-              </div>
-              <Dropdown className="w-screen">
-                <DropdownTrigger>
-                  <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">
-                    <BiGridAlt size={23} />
-                    All Departments
+                    Login
+                  </Link>
+                  <Link
+                    to={routes.register}
+                    onClick={Toggle}
+                    className="text-dark-gray-100 hover:text-deep-blue-100 py-2"
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+              {token !== undefined && (
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={confirmLogout}
+                    className="border bg-transparent text-deep-blue-100 py-2 hover:bg-deep-blue-100 hover:text-white"
+                  >
+                    Log Out
                   </Button>
-                </DropdownTrigger>
-                {categories && categories.length > 0 && (
-                  <DropdownMenu
-                    aria-label="Static Actions"
-                    className="bg-white capitalize text-dark-gray-100 text-sm shadow rounded mt-1 px-2 min-w-[200px]"
-                  >
-                    {categories.map((category) => (
-                      <DropdownItem
-                        key={category._id}
-                        onClick={() => {
-                          ChangeCategory(category.name);
-                        }}
-                        className={`${dropDownClass} ${
-                          category.status == "active" ? "block" : "hidden"
-                        }`}
-                      >
-                        {category.name}
-                      </DropdownItem>
-                    ))}
-                  </DropdownMenu>
-                )}
-              </Dropdown>
+                </div>
+              )}
             </div>
           </div>
         </div>

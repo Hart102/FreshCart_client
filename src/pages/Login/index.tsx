@@ -66,7 +66,7 @@ export default function Login() {
 
   return (
     <>
-      <div className="p-5">
+      <div className="md:p-5">
         <form className="w-full md:w-5/12 mx-auto p-5">
           <h1 className="text-2xl font-semibold mb-10">Welcome Back !</h1>
           <div className="flex flex-col gap-4 [&_span]:text-xs [&_span]:text-deep-red-100">

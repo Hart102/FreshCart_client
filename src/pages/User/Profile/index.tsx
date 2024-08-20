@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { AddressType } from "@/types/index";
+import { UserType } from "@/types/index";
 import instance from "@/api";
 
 export default function Profile() {
-  const [user, setUser] = useState<AddressType>();
+  const [user, setUser] = useState<UserType>();
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data } = await instance.get("/user//");
+      const { data } = await instance.get("/user/");
       if (!data.isError) {
         setUser(data.payload);
       }

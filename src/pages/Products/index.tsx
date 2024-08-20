@@ -20,9 +20,10 @@ import { imageUrl, divideAndInsertBr } from "@/lib";
 import { ProductType } from "@/types/index";
 import { routes } from "@/routes/route";
 import { closeModal, openModal } from "@/redux/modal_actions";
-import { ConfirmationModal } from "@/components/Templates/index";
+import { ConfirmationModal, Loader } from "@/components/Templates/index";
 import { showAlert } from "@/util/alert";
 import instance from "@/api";
+
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -56,9 +57,12 @@ export default function Products() {
   }, [products, query]);
 
   const DeleteProduct = async () => {
+    setIsLoading(true);
+    dispatch(openModal(<Loader />, "md"));
     const { data } = await instance.delete(
       `/products/delete/${products[index]._id}`
     );
+    setIsLoading(false);
     dispatch(closeModal());
     if (data?.isError) {
       showAlert("Error", data?.message, "error");
@@ -81,6 +85,7 @@ export default function Products() {
       )
     );
   };
+
   const ViewProduct = (product: ProductType) =>
     navigation(routes.dashboard_single_product, { state: product });
 
