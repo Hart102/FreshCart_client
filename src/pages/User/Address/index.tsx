@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/react";
 import { FaMapMarkerAlt, FaPencilAlt } from "react-icons/fa";
-import { AddressType } from "@/types/index";
+import { UserType } from "@/types/index";
 import AddAddress from "@/components/Create-address";
 import { useDispatch } from "react-redux";
 import { closeModal, openModal } from "@/redux/modal_actions";
@@ -11,7 +11,7 @@ import { ConfirmationModal, Loader } from "@/components/Templates/index";
 
 export default function Address() {
   const dispatch = useDispatch();
-  const [user, setUser] = useState<AddressType | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
