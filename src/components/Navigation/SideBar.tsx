@@ -1,8 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { BiGridAlt, BiLogOut } from "react-icons/bi";
+import { BiGridAlt, BiLogOut, BiShoppingBag } from "react-icons/bi";
 import { Button } from "@nextui-org/react";
 import { FaTimes } from "react-icons/fa";
-import { routes } from "@/routes/route";
 import instance from "@/api";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
@@ -55,7 +54,7 @@ export default function SideBar({
   return (
     <>
       <aside className="flex flex-col gap-8 px-4 md:px- md:py-5">
-        <Link
+        {/* <Link
           to={""}
           className={`${
             status
@@ -64,22 +63,28 @@ export default function SideBar({
           }`}
         >
           OnlineStore
-        </Link>
+        </Link> */}
+        <div
+          // to={routes.home}
+          className="font-bold text-2xl md:text-3xl flex items-center gap-2"
+        >
+          <BiShoppingBag size={30} className="text-deep-blue-100" />
+          <p className="hidden md:block">FreshCart</p>
+        </div>
         {!status && (
           <div className="flex md:hidden items-center justify-end mt-4">
             <FaTimes onClick={closeMenu} />
           </div>
         )}
         <div className="flex flex-col gap-4 justify-between">
-          <Link
-            to={routes.dashboard_home}
+          <div
             className={`items-center gap-2 px-2 py-3 rounded hover:bg-deep-gray-300 ${
               status ? "flex" : "hidden"
             }`}
           >
             <BiGridAlt size={18} />
             Dashboard
-          </Link>
+          </div>
           <div className="flex flex-col justify-between gap-2">
             <div>
               <p className={`px-2 py-3 text-sm ${status ? "block" : "hidden"}`}>
