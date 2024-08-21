@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/shop/dashboard/:path*",
+      "destination": "/shop/dashboard/index.html"
+    }
+  ]
+}
