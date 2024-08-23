@@ -183,7 +183,7 @@ export default function CheckoutSummary() {
               <div className="flex justify-end">
                 <Button
                   size="sm"
-                  className="flex items-center gap-2 text-xs"
+                  className="flex items-center gap-2 text-xs bg-transparent p-0"
                   onClick={() => removeItemFromCart(index)}
                 >
                   <FaTrashAlt className="text-deep-red-100" />
