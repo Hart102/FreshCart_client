@@ -145,7 +145,7 @@ export default function AddProduct() {
   return (
     <>
       <div className="flex flex-col md:flex-row text-sm md:p-0 p-4 justify-center">
-        <form className="w-full md:w-10/12 flex flex-col gap-8">
+        <form className="w-full md:w-10/12 flex flex-col gap-8 pb-8">
           <div className="flex flex-col gap-4">
             <p className="text-2xl font-semibold">Product Information</p>
             <div className="flex flex-col gap-4 [&_span]:text-red-500 [&_span]:text-xs [&_span]:ml-31">
@@ -184,12 +184,12 @@ export default function AddProduct() {
               </div>
               <div>
                 <p className="text-2xl font-semibold">Product Images</p>
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2 gap-8 border rounded mt-5">
                   {filesLength.map((index) => (
                     <label
                       key={index}
                       htmlFor={`${index}`}
-                      className="rounded h-36 cursor-pointer flex items-center justify-center border my-2 py-2 relative"
+                      className="rounded h-36 cursor-pointer flex items-center justify-center my-2 py-2 relative"
                     >
                       <input
                         type="file"
@@ -270,7 +270,9 @@ export default function AddProduct() {
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isLoading}
-              className="bg-deep-blue-100 text-white py-2 px-3 rounded font-semibold text-sm hover:opacity-65"
+              className={`bg-deep-blue-100 text-white py-2 px-3 rounded font-semibold text-sm hover:opacity-65 ${
+                isLoading && "opacity-65"
+              }`}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">

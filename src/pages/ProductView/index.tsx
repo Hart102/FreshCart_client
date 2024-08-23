@@ -22,7 +22,7 @@ export default function ProductView() {
         <Image
           src={imageUrl(product?.images[selectedImageIndex] || "")}
           classNames={{
-            img: "w-[510px] h-[250px] md:h-[320px]",
+            img: "w-[510px] h-[250px] md:h-[300px]",
           }}
           className="rounded-lg overflow-hidden"
         />
@@ -34,7 +34,7 @@ export default function ProductView() {
                   src={imageUrl(image)}
                   alt="product image"
                   classNames={{
-                    img: "w-[120px] h-[70px] md:h-[90px] rounded-lg cursor-pointer",
+                    img: "w-[120px] h-[70px] rounded-lg cursor-pointer",
                   }}
                   onClick={() => selectImage(index)}
                 />
