@@ -55,9 +55,7 @@ export default function SideBar({
     <>
       <aside className="flex flex-col gap-8 px-4 md:px- md:py-5">
         {!location.pathname.toLowerCase().includes("user") && (
-          <div
-            className="font-bold text-2xl md:text-3xl flex items-center gap-2"
-          >
+          <div className="hidden font-bold text-2xl md:text-3xl md:flex items-center gap-2">
             <BiShoppingBag size={30} className="text-deep-blue-100" />
             <p className="hidden md:block">FreshCart</p>
           </div>
