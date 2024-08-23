@@ -201,7 +201,7 @@ export default function CheckoutSummary() {
                     <Image
                       src={imageUrl(product?.images[0])}
                       classNames={{
-                        img: "w-[100px] h-[100px] rounded-lg",
+                        img: "w-[100px] h-[50px] md:h-[100px] rounded-lg",
                       }}
                     />
                   </div>
@@ -209,15 +209,21 @@ export default function CheckoutSummary() {
                     <p className="text-lg">{product?.price}</p>
                     <div className="flex gap-5 text-center">
                       <div className="bg-deep-gray-200 rounded text-2xl">
-                        <Button size="sm" onClick={() => deCreaseQty(index)}>
+                        <button
+                          onClick={() => deCreaseQty(index)}
+                          className="bg-white shadow-lg p-0"
+                        >
                           -
-                        </Button>
+                        </button>
                       </div>
                       <p className="border px-4 py-2">{product?.quantity}</p>
                       <div className="bg-deep-gray-200 rounded text-2xl">
-                        <Button size="sm" onClick={() => increaseQty(index)}>
+                        <button
+                          onClick={() => increaseQty(index)}
+                          className="bg-white shadow-lg p-0"
+                        >
                           +
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </div>
