@@ -201,7 +201,7 @@ export default function CheckoutSummary() {
                     <Image
                       src={imageUrl(product?.images[0])}
                       classNames={{
-                        img: "w-[100px] h-[50px] md:h-[100px] rounded-lg",
+                        img: "w-[60px] md:w-[100px] h-[50px] md:h-[100px] rounded-lg",
                       }}
                     />
                   </div>
