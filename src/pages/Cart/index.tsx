@@ -209,21 +209,23 @@ export default function CheckoutSummary() {
                     <p className="text-lg">{product?.price}</p>
                     <div className="flex gap-5 text-center">
                       <div className="bg-deep-gray-200 rounded text-2xl">
-                        <button
+                        <Button
+                          size="sm"
                           onClick={() => deCreaseQty(index)}
                           className="bg-white shadow-lg p-0"
                         >
                           -
-                        </button>
+                        </Button>
                       </div>
                       <p className="border px-4 py-2">{product?.quantity}</p>
                       <div className="bg-deep-gray-200 rounded text-2xl">
-                        <button
+                        <Button
+                          size="sm"
                           onClick={() => increaseQty(index)}
                           className="bg-white shadow-lg p-0"
                         >
                           +
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
