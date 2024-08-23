@@ -191,7 +191,7 @@ export default function CheckoutSummary() {
                 </Button>
               </div>
               <div className="flex justify-between gap-2">
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -212,7 +212,7 @@ export default function CheckoutSummary() {
                         <Button
                           size="sm"
                           onClick={() => deCreaseQty(index)}
-                          className="bg-white shadow-lg p-0"
+                          className="bg-white shadow p-0"
                         >
                           -
                         </Button>
@@ -222,7 +222,7 @@ export default function CheckoutSummary() {
                         <Button
                           size="sm"
                           onClick={() => increaseQty(index)}
-                          className="bg-white shadow-lg p-0"
+                          className="bg-white shadow p-0"
                         >
                           +
                         </Button>
