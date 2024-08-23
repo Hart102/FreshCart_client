@@ -54,23 +54,14 @@ export default function SideBar({
   return (
     <>
       <aside className="flex flex-col gap-8 px-4 md:px- md:py-5">
-        {/* <Link
-          to={""}
-          className={`${
-            status
-              ? "font-bold text-3xl hidden md:flex items-center gap-2"
-              : "hidden"
-          }`}
-        >
-          OnlineStore
-        </Link> */}
-        <div
-          // to={routes.home}
-          className="font-bold text-2xl md:text-3xl flex items-center gap-2"
-        >
-          <BiShoppingBag size={30} className="text-deep-blue-100" />
-          <p className="hidden md:block">FreshCart</p>
-        </div>
+        {!location.pathname.toLowerCase().includes("user") && (
+          <div
+            className="font-bold text-2xl md:text-3xl flex items-center gap-2"
+          >
+            <BiShoppingBag size={30} className="text-deep-blue-100" />
+            <p className="hidden md:block">FreshCart</p>
+          </div>
+        )}
         {!status && (
           <div className="flex md:hidden items-center justify-end mt-4">
             <FaTimes onClick={closeMenu} />
