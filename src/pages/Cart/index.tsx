@@ -34,7 +34,7 @@ export default function CheckoutSummary() {
   const calculateSum = () => {
     let subTotal: number = 0;
     cartItems.forEach((item) => {
-      subTotal += Number(item.price.slice(3));
+      subTotal += Number(item.price);
     });
     const total: number = subTotal;
     return { subTotal, total };
@@ -190,8 +190,8 @@ export default function CheckoutSummary() {
                   Remove
                 </Button>
               </div>
-              <div className="flex justify-between gap-2">
-                <div className="flex gap-4">
+              <div className="flex justify-between items-baseline">
+                <div className="flex gap-2">
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -205,33 +205,31 @@ export default function CheckoutSummary() {
                       }}
                     />
                   </div>
-                  <div className="flex flex-col gap-4">
-                    <p className="text-lg">{product?.price}</p>
-                    <div className="flex gap-5 text-center">
-                      <div className="bg-deep-gray-200 rounded text-2xl">
-                        <Button
-                          size="sm"
-                          onClick={() => deCreaseQty(index)}
-                          className="bg-white shadow p-0"
-                        >
-                          -
-                        </Button>
-                      </div>
-                      <p className="border px-4 py-2">{product?.quantity}</p>
-                      <div className="bg-deep-gray-200 rounded text-2xl">
-                        <Button
-                          size="sm"
-                          onClick={() => increaseQty(index)}
-                          className="bg-white shadow p-0"
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
+                </div>
+                <div className="flex items-center gap-5 text-center">
+                  <div className="bg-deep-gray-200 rounded text-2xl">
+                    <button
+                      onClick={() => deCreaseQty(index)}
+                      className="bg-deep-red-100 text-white shadow px-3"
+                    >
+                      -
+                    </button>
+                  </div>
+                  <p className="font-medium">{product?.quantity}</p>
+                  <div className="bg-deep-gray-200 rounded text-2xl">
+                    <button
+                      onClick={() => increaseQty(index)}
+                      className="bg-deep-blue-100 text-white shadow px-2"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               </div>
-              <p className="capitalize ml-4">{product?.name}</p>
+              <div>
+                <p className="text-lg font-medium">NGN {product?.price}</p>
+                <p className="capitalize">{product?.name}</p>
+              </div>
               {index % 2 == 0 && (
                 <div className="bg-deep-gray-50 rounded-full py-[2px]"></div>
               )}
