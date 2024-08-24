@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { addAddressSchema } from "@/schema/addressSchema";
 import instance from "../../api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import { useState } from "react";
 
 export default function AddAddress() {

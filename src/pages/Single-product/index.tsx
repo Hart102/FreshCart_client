@@ -8,6 +8,7 @@ import { routes } from "@/routes/route";
 import { imageUrl, setCartCount, getCartCount } from "@/lib";
 import instance from "@/api";
 import { ProtectedRoute } from "@/api/auth";
+import { formatPrice } from "@/lib/priceFormater";
 
 export default function SingleProduct() {
   const location = useLocation();
@@ -98,7 +99,9 @@ export default function SingleProduct() {
                   <p className="text-sm text-deep-blue-100">(30 reviews)</p>
                 </div>
               </div>
-              <h2 className="font-bold text-2xl">{product?.price}</h2>
+              <h2 className="font-bold text-2xl">
+                {formatPrice(Number(product?.price))}
+              </h2>
             </div>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">

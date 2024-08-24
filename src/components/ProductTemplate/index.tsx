@@ -7,6 +7,7 @@ import { ProductType } from "@/types/index";
 import { routes } from "@/routes/route";
 import instance from "../../api";
 import { ProtectedRoute } from "../../api/auth";
+import { formatPrice } from "@/lib/priceFormater";
 
 export default function ProductTemplate({ product }: { product: ProductType }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,7 +60,7 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
         </div>
       </div>
       <div className="w-full flex items-center justify-between z-10">
-        <b>{product?.price}</b>
+        <b>{formatPrice(Number(product?.price))}</b>
         <Button
           size="sm"
           onClick={() => AddToCart(product?._id)}

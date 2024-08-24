@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { addCategorySchema } from "@/schema/addCategorySchema";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export default function EditAndEditCategory() {
   const location = useLocation();

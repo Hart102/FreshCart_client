@@ -18,7 +18,7 @@ import instance from "@/api/index";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
 import { ConfirmationModal } from "@/components/Templates/index";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export default function Navbar() {
   const navigation = useNavigate();

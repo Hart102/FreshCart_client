@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { RegisterationSchema } from "@/schema/register_login_schema";
 import { routes } from "@/routes/route";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export default function Register() {
   const navigation = useNavigate();

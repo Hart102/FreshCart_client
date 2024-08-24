@@ -18,7 +18,7 @@ import { imageUrl, dateOptions } from "@/lib";
 import { OrderType } from "@/types/index";
 import { routes } from "@/routes/route";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
 import { ConfirmationModal, Loader } from "@/components/Templates";

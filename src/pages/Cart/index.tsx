@@ -6,6 +6,7 @@ import { ProductType } from "@/types/index";
 import { imageUrl, setCartCount } from "@/lib";
 import { routes } from "@/routes/route";
 import instance from "@/api";
+import {formatPrice} from "@/lib/priceFormater"
 
 export default function CheckoutSummary() {
   const navigation = useNavigate();
@@ -26,9 +27,10 @@ export default function CheckoutSummary() {
 
   const calculateTotalPriceOfEachItem = (item: ProductType) => {
     const priceWithoutDollarSign = Number(item.price.slice(3));
-    return (item.totalPrice = `${(
-      priceWithoutDollarSign * item.quantity
-    ).toFixed(2)}`);
+    return (item.totalPrice = priceWithoutDollarSign * item.quantity);
+    // return (item.totalPrice = `${(
+    //   priceWithoutDollarSign * item.quantity
+    // ).toFixed(2)}`);
   };
 
   const calculateSum = () => {
@@ -133,7 +135,9 @@ export default function CheckoutSummary() {
                       </div>
                       <div className="md:w-1/2 flex flex-col gap-2 capitalize">
                         <p>{product?.name}</p>
-                        <h2 className="text-xl">{product?.price}</h2>
+                        <h2 className="text-xl">
+                          {formatPrice(Number(product?.price))}
+                        </h2>
                       </div>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -227,7 +231,9 @@ export default function CheckoutSummary() {
                 </div>
               </div>
               <div>
-                <p className="text-lg font-medium">NGN {product?.price}</p>
+                <p className="text-lg font-medium">
+                  {formatPrice(Number(product?.price))}
+                </p>
                 <p className="capitalize">{product?.name}</p>
               </div>
               {index % 2 == 0 && (
@@ -241,7 +247,7 @@ export default function CheckoutSummary() {
 
         <div className="flex justify-between text-lg">
           <b>TOTAL</b>
-          <b className="text-xl">NGN {total.total}</b>
+          <b className="text-xl">{formatPrice(total.total)}</b>
         </div>
         <div className="flex flex-col gap-8 justify-between h-full pb-10">
           <Button

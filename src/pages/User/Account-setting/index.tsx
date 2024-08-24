@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { editDetailsSchema } from "@/schema/AccountSettingSchema";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import { UserType } from "@/types/index";
 
 export default function AccountSetting() {

@@ -6,7 +6,7 @@ import instance from "@/api";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modal_actions";
 import { ConfirmationModal } from "@/components/Templates/index";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import { ProtectedRoute } from "../../api/auth";
 import { useEffect } from "react";
 

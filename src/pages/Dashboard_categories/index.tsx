@@ -19,7 +19,7 @@ import instance from "@/api";
 import { closeModal, openModal } from "@/redux/modal_actions";
 import { useDispatch } from "react-redux";
 import { ConfirmationModal } from "@/components/Templates";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 type CategoryWithProductCount = {
   _id: number;

@@ -13,7 +13,7 @@ import AddAddress from "@/components/Create-address";
 import { openModal } from "@/redux/modal_actions";
 import { useDispatch } from "react-redux";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export default function Shiipping() {
   const location = useLocation();

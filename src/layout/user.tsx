@@ -15,7 +15,7 @@ import { Button } from "@nextui-org/react";
 import { routes } from "@/routes/route";
 import ModalLayout from "@/components/Modal_layout";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 
 const links = [

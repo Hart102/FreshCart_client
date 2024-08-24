@@ -6,7 +6,7 @@ import AddAddress from "@/components/Create-address";
 import { useDispatch } from "react-redux";
 import { closeModal, openModal } from "@/redux/modal_actions";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import { ConfirmationModal, Loader } from "@/components/Templates/index";
 
 export default function Address() {

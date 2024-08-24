@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "@/schema/register_login_schema";
 import { routes } from "@/routes/route";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import instance, { token } from "@/api";
 
 interface CookieOptions {

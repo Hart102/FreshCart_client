@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import { BiStar } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import { imageUrl } from "@/lib";
+import { formatPrice } from "@/lib/priceFormater";
+
 
 export default function ProductView() {
   const location = useLocation();
@@ -60,7 +62,9 @@ export default function ProductView() {
               <p className="text-sm text-deep-blue-100">(30 reviews)</p>
             </div>
           </div>
-          <h2 className="font-bold text-2xl">{product?.price}</h2>
+          <h2 className="font-bold text-2xl">
+            {formatPrice(Number(product?.price))}
+          </h2>
         </div>
       </div>
     </div>

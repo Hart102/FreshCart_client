@@ -21,7 +21,7 @@ import instance from "@/api";
 import { useDispatch } from "react-redux";
 import { closeModal, openModal } from "@/redux/modal_actions";
 import { ConfirmationModal } from "@/components/Templates";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export default function Orders() {
   const navigation = useNavigate();

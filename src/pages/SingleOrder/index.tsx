@@ -12,7 +12,7 @@ import {
 import { dateOptions, imageUrl } from "@/lib";
 import { CustomerOrderType } from "@/types/index";
 import instance from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export type ModalTemplateType = {
   [key: string]: JSX.Element;

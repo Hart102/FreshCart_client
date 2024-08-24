@@ -21,9 +21,9 @@ import { ProductType } from "@/types/index";
 import { routes } from "@/routes/route";
 import { closeModal, openModal } from "@/redux/modal_actions";
 import { ConfirmationModal, Loader } from "@/components/Templates/index";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 import instance from "@/api";
-
+import { formatPrice } from "@/lib/priceFormater";
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -177,7 +177,7 @@ export default function Products() {
                   >
                     {product?.status}
                   </TableCell>
-                  <TableCell>{product?.price}</TableCell>
+                  <TableCell>{formatPrice(Number(product?.price))}</TableCell>
                   <TableCell>{product?.quantity}</TableCell>
                   <TableCell>
                     <Dropdown>

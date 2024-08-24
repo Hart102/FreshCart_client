@@ -9,7 +9,7 @@ import { ProductSchema } from "@/schema/addProductSchema";
 import { imageUrl } from "@/lib";
 import { CategoryWithProductCount, ProductType } from "@/types/index";
 import instance, { token, api } from "@/api";
-import { showAlert } from "@/util/alert";
+import { showAlert } from "@/lib/alert";
 
 export default function AddProduct() {
   const params = useParams();
