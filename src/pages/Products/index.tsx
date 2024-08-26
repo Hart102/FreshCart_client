@@ -167,7 +167,7 @@ export default function Products() {
                       />
                     </div>
                   </TableCell>
-                  <TableCell>{product?.category_name}</TableCell>
+                  <TableCell>{product?.category}</TableCell>
                   <TableCell
                     className={
                       product?.status.toLowerCase() == "available"

@@ -1,4 +1,4 @@
-import { Button, Image } from "@nextui-org/react";
+import { Button, Image, useMenu } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { ProductType } from "@/types/index";
 import { imageUrl, setCartCount } from "@/lib";
 import { routes } from "@/routes/route";
 import instance from "@/api";
-import {formatPrice} from "@/lib/priceFormater"
+import { formatPrice } from "@/lib/priceFormater";
 
 export default function CheckoutSummary() {
   const navigation = useNavigate();
@@ -26,8 +26,15 @@ export default function CheckoutSummary() {
   };
 
   const calculateTotalPriceOfEachItem = (item: ProductType) => {
-    const priceWithoutDollarSign = Number(item.price.slice(3));
-    return (item.totalPrice = priceWithoutDollarSign * item.quantity);
+    const price = Number(item.price);
+    console.log(price);
+    return price;
+
+    // const price = Number(item.price);
+
+    // return price;
+    // console.log((item.totalPrice = price * item.quantity));
+    // return (item.totalPrice = price * item.quantity);
     // return (item.totalPrice = `${(
     //   priceWithoutDollarSign * item.quantity
     // ).toFixed(2)}`);
