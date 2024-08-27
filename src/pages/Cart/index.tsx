@@ -1,4 +1,4 @@
-import { Button, Image, useMenu } from "@nextui-org/react";
+import { Button, Image } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -25,19 +25,9 @@ export default function CheckoutSummary() {
     }
   };
 
-  const calculateTotalPriceOfEachItem = (item: ProductType) => {
-    const price = Number(item.price);
-    console.log(price);
-    return price;
-
-    // const price = Number(item.price);
-
-    // return price;
-    // console.log((item.totalPrice = price * item.quantity));
-    // return (item.totalPrice = price * item.quantity);
-    // return (item.totalPrice = `${(
-    //   priceWithoutDollarSign * item.quantity
-    // ).toFixed(2)}`);
+  const calculeteTotalPriceForEachItem = (item: ProductType) => {
+    item.totalPrice = Number(item.price) * item.quantity;
+    return item;
   };
 
   const calculateSum = () => {
@@ -53,14 +43,14 @@ export default function CheckoutSummary() {
   const deCreaseQty = (index: number) => {
     if (cartItems[index].quantity !== 1) {
       cartItems[index].quantity -= 1;
-      calculateTotalPriceOfEachItem(cartItems[index]);
+      calculeteTotalPriceForEachItem(cartItems[index]);
       setCartItems([...cartItems]);
     }
   };
 
   const increaseQty = (index: number) => {
     cartItems[index].quantity += 1;
-    calculateTotalPriceOfEachItem(cartItems[index]);
+    calculeteTotalPriceForEachItem(cartItems[index]);
     setCartItems([...cartItems]);
   };
 
@@ -87,7 +77,7 @@ export default function CheckoutSummary() {
             ...product,
             quantity: product.demanded_quantity,
             isChecked: false,
-            totalPrice: product.price.slice(3),
+            totalPrice: Number(product.price) * product.demanded_quantity,
           }))
         );
       }
@@ -170,7 +160,7 @@ export default function CheckoutSummary() {
                         </div>
                       </div>
                       <h2 className="text-xl self-end">
-                        NGN {Math.round(Number(product?.totalPrice))}
+                        {formatPrice(Number(product?.totalPrice))}
                       </h2>
                     </div>
                   </div>
