@@ -33,11 +33,13 @@ import Customers from "@/pages/Customers";
 import Categories from "@/pages/Dashboard_categories";
 import ProductView from "@/pages/ProductView";
 import CreateAndEditCategory from "@/pages/Create_and_edit_category";
+import NotFoundPage from "./pages/NotFoud.tsx";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       { path: routes.home, element: <Home /> },
       { path: routes.login, element: <Login /> },
@@ -51,6 +53,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <UserDasboardLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         element: <UserOrder />,
@@ -69,6 +72,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <DashboardLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       { path: routes.dashboard_products, element: <ProductsPage /> },
       {
