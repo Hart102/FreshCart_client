@@ -14,33 +14,23 @@ import { openModal } from "@/redux/modal_actions";
 import { useDispatch } from "react-redux";
 import instance from "@/api";
 import { showAlert } from "@/lib/alert";
+import { formatPrice } from "@/lib/priceFormater";
 
 export default function Shiipping() {
   const location = useLocation();
   const navigation = useNavigate();
   const dispatch = useDispatch();
   const [userAddress, setUserAddress] = useState<AddressType[]>([]);
+  const [sum, setSum] = useState<number>(0);
   const [shoppingBag, setShoppingBag] = useState<ShoppingBagType>({
     addressId: "",
     totalPrice: 0,
     products: [],
   });
 
-  const calculatedSum = useMemo(() => {
-    let subTotal: number = 0;
-    location.state.forEach((item: ProductType) => {
-      subTotal += Number(item.price.slice(3)) * Number(item.quantity);
-    });
-
-    const total: number = subTotal;
-    subTotal = Math.floor(subTotal);
-    return { subTotal, total };
-  }, [location.state]);
-
+  // Fetch Customer Address
   const fetchUserAddress = useMemo(async () => {
     const { data } = await instance.get("/user/");
-    console.log(data);
-
     if (!data.isError) setUserAddress(data?.payload?.addresses);
   }, []);
 
@@ -59,25 +49,26 @@ export default function Shiipping() {
     const products = location.state.map((item: ProductType) => ({
       productId: item._id,
       demandedQuantity: item.quantity,
-      price: `${(Number(item.price.slice(3)) * item.quantity).toFixed(2)}`,
+      price: Number(item.price) * Number(item.quantity),
     }));
     const total = location.state.reduce(
       (acc: number, item: ProductType) =>
-        acc + Number(item.price.slice(3)) * item.quantity,
+        acc + Number(item.price) * Number(item.quantity),
       0
     );
+
+    let Sum = 0; // Calculate total Price
+    location.state.map((item: ProductType) => {
+      Sum += Number(item.totalPrice);
+      setSum(Sum);
+    });
+
     setShoppingBag({
       addressId: userAddress[0]?._id || "",
       totalPrice: total,
       products: products,
     });
-  }, [
-    location,
-    navigation,
-    fetchUserAddress,
-    userAddress,
-    calculatedSum.total,
-  ]);
+  }, [location, navigation, fetchUserAddress, userAddress]);
 
   const handleAddAddress = () => {
     dispatch(openModal(<AddAddress />, "3xl"));
@@ -240,7 +231,8 @@ export default function Shiipping() {
           <p className="text-lg">SUMMARY</p>
           <div className="flex justify-between text-lg">
             <b>TOTAL</b>
-            <b>NGN {calculatedSum?.total}</b>
+            {/* <b>NGN {calculatedSum?.total}</b> */}
+            <b>{formatPrice(sum)}</b>
           </div>
           <div className="w-full flex flex-col gap-4">
             <p className="text-lg">IN YOUR CART</p>
@@ -261,11 +253,9 @@ export default function Shiipping() {
                   </div>
                   <div className="flex flex-col capitalize text-sm">
                     <p className="capitalize mb-1">{product?.name}</p>
-                    <p className="text-dark-gray-100">
-                      Qauntity: {product?.quantity}
-                    </p>
-                    <p className="mt-1 text-dark-gray-100">
-                      NGN {product?.totalPrice}
+                    <p className="font-medium">Qauntity: {product?.quantity}</p>
+                    <p className="mt-1 font-medium">
+                      {formatPrice(Number(product?.totalPrice))}
                     </p>
                   </div>
                 </div>
