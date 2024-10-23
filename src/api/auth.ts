@@ -8,7 +8,7 @@ const getauthentication_tokenFromCookieStorage = () => {
   return cookieMap;
 };
 
-const token = getauthentication_tokenFromCookieStorage()["online_store"];
+const token = getauthentication_tokenFromCookieStorage()["freshCart"];
 
 const ProtectedRoute = () => {
   if (token == undefined) {

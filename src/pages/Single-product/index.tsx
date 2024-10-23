@@ -1,58 +1,53 @@
 import { Button, Image, Spinner } from "@nextui-org/react";
-import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { BiStar, BiCartAdd } from "react-icons/bi";
 import { ProductType } from "@/types/index";
 import ProductTemplate from "@/components/ProductTemplate";
-import { routes } from "@/routes/route";
 import { imageUrl, setCartCount, getCartCount } from "@/lib";
 import instance from "@/api";
 import { ProtectedRoute } from "@/api/auth";
 import { formatPrice } from "@/lib/priceFormater";
 
 export default function SingleProduct() {
-  const location = useLocation();
-  const navigation = useNavigate();
-  const [product, setProduct] = useState<ProductType>();
+  const params = useParams();
+  const [selectedProduct, setSelectedProduct] = useState<ProductType>();
   const [relatedProducts, setRelatedProducts] = useState<ProductType[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const { categoryName, productId } = params
   const selectImage = (imageIndex: number) => setSelectedImageIndex(imageIndex);
   const IncreaseQuntiy = () => setQuantity(quantity + 1);
   const DecreaseQuantity = () => quantity !== 0 && setQuantity(quantity - 1);
 
-  const FetchRelatedProducts = useCallback(async () => {
-    const { data } = await instance.get(
-      `/products/category/${location.state.category}`
-    );
-    if (!data.isError) {
-      setRelatedProducts(data.payload);
-    }
-  }, [location?.state?.category]);
-
   const AddToCart = async () => {
     ProtectedRoute();
     setIsLoading(true);
-    const { data } = await instance.put("/cart/add-to-cart", {
-      product_id: product?._id,
+    const { data } = await instance.put("/cart/add", {
+      product_id: selectedProduct?._id,
       quantity: quantity,
     });
+    
     setIsLoading(false);
-    if (data.total_items) {
+    if (!data.isError) {
       setCartCount(data.total_items);
       getCartCount();
     }
   };
 
   useEffect(() => {
-    if (location.state == null || location.state == undefined) {
-      return navigation(routes?.login);
-    }
-    setProduct(location?.state);
-    FetchRelatedProducts();
-  }, [location, navigation, FetchRelatedProducts]);
+    instance.get(`/products/category/${categoryName}`).then((res) => {
+      const result = res.data;
+
+      if (!result.isError) {
+        setRelatedProducts(result.payload);
+        setSelectedProduct(result.payload.find((product: ProductType) => product._id === productId));
+      }
+    });
+  }, [categoryName, productId]);
+
 
   return (
     <div>
@@ -60,12 +55,12 @@ export default function SingleProduct() {
         <div className="flex flex-col md:flex-row gap-10 md:gap-20">
           <div className="w-full md:w-1/2 flex flex-col gap-8 md:px-10">
             <img
-              src={imageUrl(product?.images[selectedImageIndex] || "")}
+              src={imageUrl(selectedProduct?.images[selectedImageIndex] || "")}
               className="w-[510px] h-[250px] md:h-[320px] rounded-lg"
             />
             <div className="flex gap-3">
-              {product &&
-                product?.images.map((image, index) => (
+              {selectedProduct &&
+                selectedProduct?.images.map((image, index) => (
                   <div key={index}>
                     <Image
                       src={imageUrl(image)}
@@ -82,11 +77,11 @@ export default function SingleProduct() {
           <div className="w-full md:w-1/2 flex flex-col gap-5">
             <div className="w-full flex flex-col gap-5 border-b pb-5">
               <p className="text-sm text-deep-blue-100 capitalize">
-                {product?.category}
+                {selectedProduct?.category}
               </p>
               <div className="flex flex-col gap-2">
                 <h1 className="capitalize text-3xl font-bold">
-                  {product?.name}
+                  {selectedProduct?.name}
                 </h1>
                 <div className="flex items-center gap-5">
                   <div className="flex gap-2 text-yellow-500">
@@ -100,7 +95,7 @@ export default function SingleProduct() {
                 </div>
               </div>
               <h2 className="font-bold text-2xl">
-                {formatPrice(Number(product?.price))}
+                {formatPrice(selectedProduct?.price)}
               </h2>
             </div>
             <div className="flex flex-col gap-4">

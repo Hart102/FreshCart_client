@@ -33,10 +33,8 @@ export default function AccountSetting() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data } = await instance.get("/user/");
-      if (!data.isError) {
-        setUser(data.payload);
-      }
+      const { data } = await instance.get("/user/get-profile");
+      if (!data.isError) setUser(data.payload);
     };
     fetchUser();
   }, []);
@@ -49,8 +47,9 @@ export default function AccountSetting() {
 
   const EditProfile = async (data: editDetailsSchema) => {
     setIsLoading(true);
-    const request = await instance.patch("/user/edit-profile", data);
+    const request = await instance.patch("/user/update-profile", data);
     const response = request.data;
+
     setIsLoading(false);
     if (response.isError) {
       showAlert("Error", response?.message, "error");
@@ -59,12 +58,8 @@ export default function AccountSetting() {
     }
   };
 
-  const setOldPassword = (e: string) => {
-    setPassword({ ...password, oldPassword: e });
-  };
-  const setNewPassword = (e: string) => {
-    setPassword({ ...password, newPassword: e });
-  };
+  const setOldPassword = (e: string) => setPassword({ ...password, oldPassword: e });
+  const setNewPassword = (e: string) => setPassword({ ...password, newPassword: e });
 
   const ResetPassword = async () => {
     setLoading(true);
@@ -72,10 +67,9 @@ export default function AccountSetting() {
       oldPassword: password.oldPassword,
       newPassword: password.newPassword,
     });
+
     setLoading(false);
-    if (data?.isError) {
-      return showAlert("Error", data?.message, "error");
-    }
+    if (data?.isError) return showAlert("Error", data?.message, "error");
     showAlert("Success", data?.message, "success");
   };
 

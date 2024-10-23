@@ -63,8 +63,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const FetchCategories = async () => {
-      const { data } = await instance.get("/categories/fetch-all-categorie");
-
+      const { data } = await instance.get("/categories/");
+      
       if (!data.isError) {
         setCategories(data.payload);
       }
@@ -130,7 +130,7 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-          <div className="w-full md:w-11/12 mx-auto md:px-14 px-5 hidden md:flex gap-8 items-center pb-2">
+          <div className="w-full md:w-11/12 mx-auto md:px-14 px-5 hidden md:flex gap-8 items-center pb-2 text-sm">
             <Dropdown className="shadow-none">
               <DropdownTrigger>
                 <Button className="bg-deep-blue-100 text-white rounded-lg flex gap-2">

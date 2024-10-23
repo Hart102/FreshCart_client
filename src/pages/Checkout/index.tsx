@@ -1,4 +1,4 @@
-import { Button, Image, Accordion, AccordionItem } from "@nextui-org/react";
+import { Button, Accordion, AccordionItem } from "@nextui-org/react";
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
@@ -80,17 +80,6 @@ export default function Shiipping() {
     formState: { errors },
   } = useForm<debitCardSchema>({ resolver: yupResolver(debitCardSchema) });
 
-  // const placeOrder = async () => {
-  //   dispatch(openModal(<Loader />, "md"));
-  //   const request = await instance.post("/transactions/accept-payment");
-  //   const response = await request.data;
-  //   if (response.isError) {
-  //     showAlert("Error", response?.message, "error");
-  //   } else {
-  //     navigation(routes.user_profile);
-  //     window.open(response.payment_url, "_blank");
-  //   }
-  // };
 
   const validateInput = async (data: debitCardSchema) => {
     console.log(data);
@@ -231,8 +220,7 @@ export default function Shiipping() {
           <p className="text-lg">SUMMARY</p>
           <div className="flex justify-between text-lg">
             <b>TOTAL</b>
-            {/* <b>NGN {calculatedSum?.total}</b> */}
-            <b>{formatPrice(sum)}</b>
+            <b>{formatPrice(String(sum))}</b>
           </div>
           <div className="w-full flex flex-col gap-4">
             <p className="text-lg">IN YOUR CART</p>
@@ -244,18 +232,18 @@ export default function Shiipping() {
                     index + 1 < location.state?.length && "border-b pb-5"
                   }`}
                 >
-                  <div className="h-[100px] w-[80px] z-0">
-                    <Image
+                  <div className="h-[80px] w-[80px] z-0">
+                    <img
                       src={imageUrl(product?.images[0])}
                       alt="product image"
-                      className="object-contain w-full h-full rounded"
+                      className="object-cover w-full h-full rounded"
                     />
                   </div>
                   <div className="flex flex-col capitalize text-sm">
                     <p className="capitalize mb-1">{product?.name}</p>
                     <p className="font-medium">Qauntity: {product?.quantity}</p>
                     <p className="mt-1 font-medium">
-                      {formatPrice(Number(product?.totalPrice))}
+                      {formatPrice(String(product?.totalPrice))}
                     </p>
                   </div>
                 </div>

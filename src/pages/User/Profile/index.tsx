@@ -7,13 +7,14 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data } = await instance.get("/user/");
+      const { data } = await instance.get("/user/get-profile");
       if (!data.isError) {
         setUser(data.payload);
       }
     };
     fetchUser();
   }, []);
+  
   return (
     <div>
       <div

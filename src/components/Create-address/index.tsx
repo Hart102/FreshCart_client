@@ -18,8 +18,9 @@ export default function AddAddress() {
 
   const onSubmit = async (data: addAddressSchema) => {
     setIsLoading(true);
-    const request = await instance.post("/user/add-address", data);
+    const request = await instance.put("/user/create-address", data);
     const response = await request.data;
+
     setIsLoading(false);
     if (response.isError) {
       showAlert("Error", response?.message, "error");

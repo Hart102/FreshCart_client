@@ -32,7 +32,7 @@ export default function Categories() {
 
   useEffect(() => {
     const FetchCategoryList = async () => {
-      const { data } = await instance.get("/categories/fetch-all-categorie");
+      const { data } = await instance.get("/categories/");
       if (!data.isError) {
         setCategories(data.payload);
       }

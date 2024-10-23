@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { BiShoppingBag, BiStar } from "react-icons/bi";
 import { getCartCount, imageUrl, setCartCount } from "@/lib";
 import { ProductType } from "@/types/index";
-import { routes } from "@/routes/route";
 import instance from "../../api";
 import { ProtectedRoute } from "../../api/auth";
 import { formatPrice } from "@/lib/priceFormater";
@@ -13,14 +12,14 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigation = useNavigate();
-  const ViewProduct = (cat: ProductType) => {
-    navigation(routes?.single_product, { state: cat });
+  const ViewProduct = (categoryName: string, selectedProductId: string) => {
+    navigation(`/shop/category/${categoryName}/${selectedProductId}`)
   };
 
   const AddToCart = async (productId: string) => {
     ProtectedRoute();
     setIsLoading(true);
-    const { data } = await instance.put("/cart/add-to-cart", {
+    const { data } = await instance.put("/cart/add", {
       product_id: productId,
       quantity: 1,
     });
@@ -34,7 +33,7 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
 
   return (
     <div
-      onClick={() => ViewProduct(product)}
+      onClick={() => ViewProduct(product?.category_name, product?._id)}
       className="p-4 flex flex-col items-center gap-4 rounded-lg bg-white
         border border-deep-gray-300 hover:border-deep-blue-100 cursor-pointer"
     >
@@ -60,7 +59,7 @@ export default function ProductTemplate({ product }: { product: ProductType }) {
         </div>
       </div>
       <div className="w-full flex items-center justify-between z-10">
-        <b>{formatPrice(Number(product?.price))}</b>
+        <b>{formatPrice(product?.price)}</b>
         <Button
           size="sm"
           onClick={() => AddToCart(product?._id)}

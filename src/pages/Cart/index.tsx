@@ -26,14 +26,19 @@ export default function CheckoutSummary() {
   };
 
   const calculeteTotalPriceForEachItem = (item: ProductType) => {
-    item.totalPrice = Number(item.price) * item.quantity;
+    const numericPrice = Number(item.price.replace(/\D/g, ''));
+    const totalPrice = numericPrice * item.quantity;
+
+    item.totalPrice = totalPrice;
     return item;
   };
+
 
   const calculateSum = () => {
     let subTotal: number = 0;
     cartItems.forEach((item) => {
-      subTotal += Number(item.price);
+      const numericPrice = Number(item.price.replace(/\D/g, ''));
+      subTotal += numericPrice * item.quantity; 
     });
     const total: number = subTotal;
     return { subTotal, total };
@@ -55,9 +60,7 @@ export default function CheckoutSummary() {
   };
 
   const removeItemFromCart = async (index: number) => {
-    const { data } = await instance.delete(
-      `/cart/remove-cart-item/${cartItems[index]._id}`
-    );
+    const { data } = await instance.delete(`/cart/remove-cart-item/${cartItems[index]._id}`);
     if (!data.isError) {
       cartItems.splice(index, 1);
       setCartItems([...cartItems]);
@@ -65,20 +68,24 @@ export default function CheckoutSummary() {
     }
   };
 
-  const handleCheckout = () =>
-    navigation(routes.checkout, { state: selectedItems });
+  const handleCheckout = () => navigation(routes.checkout, { state: selectedItems });
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      const { data } = await instance.get("/cart/get-cart-items");
+      const { data } = await instance.get("/cart/");
       if (!data.isError) {
-        setCartItems(
-          data.payload.map((product: ProductType) => ({
-            ...product,
-            quantity: product.demanded_quantity,
-            isChecked: false,
-            totalPrice: Number(product.price) * product.demanded_quantity,
-          }))
+       setCartItems(
+          data.payload.map((product: ProductType) => {
+            const priceWithoutCurrency = product.price.replace(/\D/g, '');
+            const numericPrice = Number(priceWithoutCurrency);
+
+            return {
+              ...product,
+              quantity: product.demanded_quantity,
+              isChecked: false,
+              totalPrice: numericPrice * Number(product.demanded_quantity),
+            };
+          })
         );
       }
     };
@@ -132,9 +139,7 @@ export default function CheckoutSummary() {
                       </div>
                       <div className="md:w-1/2 flex flex-col gap-2 capitalize">
                         <p>{product?.name}</p>
-                        <h2 className="text-xl">
-                          {formatPrice(Number(product?.price))}
-                        </h2>
+                        <h2 className="text-xl">{product?.price}</h2>
                       </div>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -159,9 +164,7 @@ export default function CheckoutSummary() {
                           </Button>
                         </div>
                       </div>
-                      <h2 className="text-xl self-end">
-                        {formatPrice(Number(product?.totalPrice))}
-                      </h2>
+                      <h2 className="text-xl self-end">NGN {product?.totalPrice}</h2>
                     </div>
                   </div>
                 </div>
@@ -229,7 +232,7 @@ export default function CheckoutSummary() {
               </div>
               <div>
                 <p className="text-lg font-medium">
-                  {formatPrice(Number(product?.price))}
+                  {formatPrice(product?.price)}
                 </p>
                 <p className="capitalize">{product?.name}</p>
               </div>
@@ -244,7 +247,7 @@ export default function CheckoutSummary() {
 
         <div className="flex justify-between text-lg">
           <b>TOTAL</b>
-          <b className="text-xl">{formatPrice(total.total)}</b>
+          <b className="text-xl">NGN {(total.total)}</b>
         </div>
         <div className="flex flex-col gap-8 justify-between h-full pb-10">
           <Button

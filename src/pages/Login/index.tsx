@@ -44,7 +44,7 @@ export default function Login() {
       document.cookie =
         options.name + "=" + (options.value || "") + expires + "; path=/";
     };
-    setCookie({ name: "online_store", value: response.payload });
+    setCookie({ name: "freshCart", value: response.payload });
 
     if (response?.user_role == "admin") {
       return (window.location.href = routes.dashboard_products);

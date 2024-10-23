@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "@/components/Navigation/SideBar";
 import {
@@ -11,11 +11,11 @@ import {
 import { FaMapMarkerAlt } from "react-icons/fa";
 import NewNavBar from "@/components/Navigation/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@nextui-org/react";
+// import { Button } from "@nextui-org/react";
 import { routes } from "@/routes/route";
 import ModalLayout from "@/components/Modal_layout";
-import instance from "@/api";
-import { showAlert } from "@/lib/alert";
+// import instance from "@/api";
+// import { showAlert } from "@/lib/alert";
 
 
 const links = [
@@ -35,44 +35,44 @@ const links = [
 ];
 
 export default function UserDasboardLayout() {
-  const [paymentStatus, setPaymentStatus] = useState(false);
+  // const [paymentStatus, setPaymentStatus] = useState(false);
   const [toggleStatus, setToggleStatus] = useState<boolean>(false);
 
   const toggle = () =>
     !toggleStatus ? setToggleStatus(true) : setToggleStatus(false);
 
-  const confirmPayment = async () => {
-    const { data } = await instance.get("/transactions/confirm-payment");
-    if (data?.isError) {
-      showAlert("Error", data.message, "error");
-      return;
-    }
-    showAlert("Success", data?.message, "success");
-  };
+  // const confirmPayment = async () => {
+  //   const { data } = await instance.get("/transactions/confirm-payment");
+  //   if (data?.isError) {
+  //     showAlert("Error", data.message, "error");
+  //     return;
+  //   }
+  //   showAlert("Success", data?.message, "success");
+  // };
 
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      try {
-        const { data } = await instance.get(
-          "/transactions/getUncompleted-payment"
-        );
-        if (!data.isError && data.payload.length > 0) {
-          setPaymentStatus(true);
-        } else {
-          setPaymentStatus(false);
-        }
-      } catch (error) {
-        setPaymentStatus(false);
-      }
-    }, 3000);
-    return () => clearInterval(intervalId);
-  }, []);
+  // useEffect(() => {
+  //   const intervalId = setInterval(async () => {
+  //     try {
+  //       const { data } = await instance.get(
+  //         "/transactions/getUncompleted-payment"
+  //       );
+  //       if (!data.isError && data.payload.length > 0) {
+  //         setPaymentStatus(true);
+  //       } else {
+  //         setPaymentStatus(false);
+  //       }
+  //     } catch (error) {
+  //       setPaymentStatus(false);
+  //     }
+  //   }, 3000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   return (
     <>
       <NewNavBar />
       <div className="w-full md:w-11/12 px-4 md:px-16 mx-auto md:py-8 text-dark-gray-100">
-        {paymentStatus && (
+        {/* {paymentStatus && (
           <div className="py-1 px-5 border-b flex justify-end">
             <Button
               size="sm"
@@ -84,7 +84,7 @@ export default function UserDasboardLayout() {
               VERIFY PAYMENT
             </Button>
           </div>
-        )}
+        )} */}
         <div className="relative md:mt-5 md:flex gap-10 pb-10">
           <div
             className={`w-full md:w-3/12 h-screen md:h-fit md:pr-4 md:border-r border-dotted

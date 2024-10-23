@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
 
       { path: routes.cart, element: <Cart /> },
       { path: routes.checkout, element: <Checkout /> },
-      { path: routes.single_product, element: <SingleProduct /> },
+      { path: "/shop/category/:categoryName/:productId", element: <SingleProduct /> },
       { path: `${routes.categories}/:category`, element: <Categories_page /> },
     ],
   },

@@ -51,7 +51,7 @@ export default function Footer() {
   useEffect(() => {
     const FetchCategories = async () => {
       setIsLoading(true);
-      const { data } = await instance.get("/categories/fetch-all-categorie");
+      const { data } = await instance.get("/categories/");
 
       setIsLoading(false);
       if (!data.isError) {

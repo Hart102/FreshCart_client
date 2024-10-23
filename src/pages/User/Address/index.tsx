@@ -16,7 +16,7 @@ export default function Address() {
 
   useEffect(() => {
     const fetchaddress = async () => {
-      const { data } = await instance.get("/user//");
+      const { data } = await instance.get("/user/get-profile");
       if (!data.isError) {
         setUser(data.payload);
       }
@@ -45,15 +45,16 @@ export default function Address() {
     dispatch(openModal(<Loader />, "md"));
 
     const address_id = user && user?.addresses[index]?._id;
-    const { data } = await instance.delete(
-      `/user/delete-address/${address_id}`
-    );
+    const { data } = await instance.delete(`/user/delete-address/${address_id}`);
+    
     if (data?.isError) {
       showAlert("Error", data?.message, "error");
     } else {
-      user?.addresses?.splice(index, 1);
+      const address = user?.addresses?.filter((address) => address._id !== user?.addresses[index]._id)
+      setUser({ ...user, addresses: address })
       showAlert("Success", data?.message, "success");
       dispatch(closeModal());
+      setIndex(0)
     }
   };
 
