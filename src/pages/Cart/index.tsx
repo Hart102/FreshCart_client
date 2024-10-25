@@ -60,7 +60,7 @@ export default function CheckoutSummary() {
   };
 
   const removeItemFromCart = async (index: number) => {
-    const { data } = await instance.delete(`/cart/remove-cart-item/${cartItems[index]._id}`);
+    const { data } = await instance.delete(`/cart/remove/${cartItems[index]._id}`);
     if (!data.isError) {
       cartItems.splice(index, 1);
       setCartItems([...cartItems]);
