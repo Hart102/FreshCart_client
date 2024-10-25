@@ -18,5 +18,5 @@
 
 
 ## Preview Link:
-https://freshcart-client.onrender.com/
+https://online-store-mk6gluh4v-chikanma2023s-projects.vercel.app/
 
