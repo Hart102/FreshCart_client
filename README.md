@@ -18,5 +18,5 @@
 
 
 ## Preview Link:
-https://online-store-neon-one.vercel.app/
+https://freshcart-client.onrender.com/
 
