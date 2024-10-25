@@ -74,9 +74,11 @@ export default function Navbar() {
     fetchUserRole();
   }, []);
 
-  setInterval(() => {
-    setCartCount(getCartCount());
-  }, 3000);
+  if(getCartCount() !== null){
+    setInterval(() => {
+      setCartCount(getCartCount());
+    }, 8000);
+  }
 
   const Toggle = () => (!isMenuOpen ? setIsOpen(true) : setIsOpen(false));
 

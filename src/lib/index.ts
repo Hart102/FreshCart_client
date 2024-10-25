@@ -10,6 +10,7 @@ export const setCartCount = (value: string) =>
 
 export const getCartCount = () => {
   const itemsCount = localStorage.getItem("cartItems");
+  
   if (itemsCount) {
     return JSON.parse(itemsCount);
   } else {
