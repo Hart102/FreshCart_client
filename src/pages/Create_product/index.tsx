@@ -1,14 +1,13 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Image, Spinner } from "@nextui-org/react";
-import axios from "axios";
 import { BiCloudUpload } from "react-icons/bi";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { ProductSchema } from "@/schema/addProductSchema";
 import { imageUrl } from "@/lib";
 import { CategoryWithProductCount, ProductType } from "@/types/index";
-import instance, { token, api } from "@/api";
+import instance from "@/api";
 import { showAlert } from "@/lib/alert";
 
 export default function AddProduct() {
@@ -25,10 +24,9 @@ export default function AddProduct() {
     null
   );
 
-  console.log(selectedProduct);
 
   const FetchCategories = async () => {
-    const { data } = await instance.get("/categories/fetch-all-categorie");
+    const { data } = await instance.get("/categories");
     if (!data.isError) {
       setCategories(data.payload);
     }
@@ -37,10 +35,9 @@ export default function AddProduct() {
   const fetctSelectedProduct = async () => {
     if (params?.id !== "create") {
       const { data } = await instance.get(`/products/${params.id}`);
-      setSelectedProduct(data.payload.product);
 
-      const { name, price, quantity, status, description, images } =
-        data.payload.product;
+      setSelectedProduct(data.payload);
+      const { name, price, quantity, status, description, images } = data.payload;
 
       setValue("productName", name);
       setValue("category", data?.category_name);
@@ -92,37 +89,31 @@ export default function AddProduct() {
       }
     }
   };
-
-  const endpoint = params.id == "create" ? "products/create" : "products/edit";
+  const endpoint = params.id == "create" ? "products/create" : `products/edit/${params.id}`;
 
   const handleApiRequest = async (data: ProductSchema) => {
     setIsLoading(true);
-
-    const price = params.id !== "create" ? `NGN ${data.price}` : data.price;
-    const category =
-      params.id == "create" ? data.category : selectedProduct?.category_id;
+    const category = params.id == "create" ? data.category : selectedProduct?.category_id;
 
     const formData = new FormData();
     files.forEach((file: File) => formData.append("file", file));
     formData.append("name", data.productName);
-    formData.append("category", `${category}`);
-    formData.append("price", price);
+    formData.append("category_id", `${category}`);
+    formData.append("price", data.price);
     formData.append("quantity", data.quantity);
     formData.append("status", data.status);
     formData.append("description", data.description);
     //Edit
     if (params.id !== "create") {
-      formData.append("id", `${params?.id}`);
       formData.append("replacedImageIds", JSON.stringify(replacedImages));
-      if (files.length < 1) {
-        formData.append("images", JSON.stringify(productImages));
-      }
+      formData.append("images", JSON.stringify(productImages)); 
     }
 
     try {
-      const request = await axios.put(`${api}/${endpoint}`, formData, {
-        headers: { Authorization: token },
-      });
+      const request = await instance.post(endpoint, formData, { headers: {
+        'Content-Type': 'multipart/form-data',
+      }})
+
       const response = await request.data;
       setIsLoading(false);
       if (response?.isError) {

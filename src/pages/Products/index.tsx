@@ -23,7 +23,7 @@ import { closeModal, openModal } from "@/redux/modal_actions";
 import { ConfirmationModal, Loader } from "@/components/Templates/index";
 import { showAlert } from "@/lib/alert";
 import instance from "@/api";
-import { formatPrice } from "@/lib/priceFormater";
+// import { formatPrice } from "@/lib/priceFormater";
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -55,6 +55,8 @@ export default function Products() {
       return products;
     }
   }, [products, query]);
+
+  console.log(products)
 
   const DeleteProduct = async () => {
     setIsLoading(true);
@@ -177,7 +179,7 @@ export default function Products() {
                   >
                     {product?.status}
                   </TableCell>
-                  <TableCell>{formatPrice(Number(product?.price))}</TableCell>
+                  <TableCell>{product?.price}</TableCell>
                   <TableCell>{product?.quantity}</TableCell>
                   <TableCell>
                     <Dropdown>

@@ -63,7 +63,7 @@ export default function ProductView() {
             </div>
           </div>
           <h2 className="font-bold text-2xl">
-            {formatPrice(Number(product?.price))}
+            {formatPrice(product?.price)}
           </h2>
         </div>
       </div>

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {   useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Image,
   Table,
@@ -11,8 +11,7 @@ import {
 } from "@nextui-org/react";
 import { dateOptions, imageUrl } from "@/lib";
 import { CustomerOrderType } from "@/types/index";
-import instance from "@/api";
-import { showAlert } from "@/lib/alert";
+
 
 export type ModalTemplateType = {
   [key: string]: JSX.Element;
@@ -20,46 +19,10 @@ export type ModalTemplateType = {
 };
 
 export default function SingleOrder() {
-  const location = useLocation();
-  const navigation = useNavigate();
-  const [orderDetails, setOrderDetails] = useState<CustomerOrderType>();
-  const [orders, setOrders] = useState<CustomerOrderType[]>([]);
 
-  const FetchData = useCallback(async () => {
-    const { data } = await instance.get(
-      `/transactions/fetch-customer-and-orderDetails/${location.state}`
-    );
-    if (!data.isError) {
-      setOrderDetails(data.payload);
-      const request = await instance.post(
-        "/transactions/fetch-order-and-products",
-        {
-          userId: data.payload.user_id,
-          orderId: data.payload.transaction_reference,
-        }
-      );
-      const response = await request.data;
-      setOrders(response.payload);
-    } else {
-      showAlert("Error", data?.message, "error");
-    }
-  }, [location.state]);
+  const [orderDetails] = useState<CustomerOrderType>();
+  const [orders] = useState<CustomerOrderType[]>([]);
 
-  const totalPrice = () => {
-    let total = 0;
-    for (let i = 0; i < orders.length; i++) {
-      const price = parseFloat(orders[i].total_price.replace(/[^0-9.-]+/g, ""));
-      total += price;
-    }
-    return total;
-  };
-  const grandTotal = `NGN ${totalPrice()}`;
-  useEffect(() => {
-    if (location.state == null) {
-      navigation("/");
-    }
-    FetchData();
-  }, [location.state, navigation, FetchData]);
 
   return (
     <>
@@ -181,7 +144,7 @@ export default function SingleOrder() {
                 <div className="w-full md:w-1/3 flex flex-col gap-5">
                   <div className="flex justify-between font-semibold">
                     <p>Grand Total :</p>
-                    <p>{grandTotal}</p>
+                    {/* <p>{grandTotal}</p> */}
                   </div>
                 </div>
               </div>

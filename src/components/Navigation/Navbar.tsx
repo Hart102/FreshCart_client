@@ -40,12 +40,13 @@ export default function Navbar() {
     );
   };
 
+
   const fetchUserRole = async () => {
     if (token) {
-      const { data } = await instance.get("/user/fetch-user-role");
+      const { data } = await instance.get("/user/get-profile");
 
       if (!data.isError) {
-        setUserRole(data.payload);
+        setUserRole(data.payload.user_role);
       }
     }
   };
@@ -53,8 +54,8 @@ export default function Navbar() {
   const Logout = async () => {
     const { data } = await instance.post("/user/logout");
     if (!data.isError) {
-      document.cookie =
-        "online_store" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+       document.cookie =
+        "freshCart" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       window.location.reload();
     } else {
       showAlert("Error", data?.message, "error");

@@ -32,7 +32,7 @@ export default function SideBar({
     const { data } = await instance.post("/user/logout");
     if (!data.isError) {
       document.cookie =
-        "online_store" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        "freshCart" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       window.location.reload();
     } else {
       showAlert("Error", data?.message, "error");

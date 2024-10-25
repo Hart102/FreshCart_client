@@ -46,12 +46,16 @@ export default function Address() {
 
     const address_id = user && user?.addresses[index]?._id;
     const { data } = await instance.delete(`/user/delete-address/${address_id}`);
-    
+
     if (data?.isError) {
       showAlert("Error", data?.message, "error");
     } else {
-      const address = user?.addresses?.filter((address) => address._id !== user?.addresses[index]._id)
-      setUser({ ...user, addresses: address })
+      const updatedAddresses = user?.addresses?.filter((address) => address._id !== user?.addresses[index]._id) || []
+      setUser(prevUser => prevUser ? { 
+        ...prevUser, 
+        addresses: updatedAddresses,
+        _id: prevUser._id || ''
+      } : null);
       showAlert("Success", data?.message, "success");
       dispatch(closeModal());
       setIndex(0)

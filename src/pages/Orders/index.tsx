@@ -12,21 +12,21 @@ import {
   TableHeader,
   TableRow,
 } from "@nextui-org/react";
-import { useEffect, useMemo, useState } from "react";
+import {  useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { imageUrl, dateOptions } from "@/lib";
 import { OrderType } from "@/types/index";
 import { routes } from "@/routes/route";
-import instance from "@/api";
-import { useDispatch } from "react-redux";
-import { closeModal, openModal } from "@/redux/modal_actions";
-import { ConfirmationModal } from "@/components/Templates";
-import { showAlert } from "@/lib/alert";
+// import instance from "@/api";
+// import { useDispatch } from "react-redux";
+// import { closeModal, openModal } from "@/redux/modal_actions";
+// import { ConfirmationModal } from "@/components/Templates";
+// import { showAlert } from "@/lib/alert";
 
 export default function Orders() {
   const navigation = useNavigate();
-  const dispatch = useDispatch();
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  // const dispatch = useDispatch();
+  const [orders] = useState<OrderType[]>([]);
   const [searchString, setSearchString] = useState<string>("");
 
   const searchResult = useMemo(() => {
@@ -48,42 +48,35 @@ export default function Orders() {
     }
   }, [orders, searchString]);
 
-  useEffect(() => {
-    FetchOrders();
-  }, []);
 
-  const FetchOrders = async () => {
-    const { data } = await instance.get("/transactions/fetch-all-orders");
-    if (!data.isError) {
-      setOrders(data.payload);
-    }
-  };
 
-  const DeleteOrder = async (index: number) => {
-    const { data } = await instance.delete(
-      `/transactions/delete-order/${orders[index]._id}`
-    );
-    dispatch(closeModal());
-    if (data.error) {
-      showAlert("Error", data?.message, "error");
-    } else {
-      orders.splice(index, 1);
-      setOrders([...orders]);
-      showAlert("Success", data?.message, "success");
-    }
-  };
 
-  const openDeleteModal = (index: number) => {
-    dispatch(
-      openModal(
-        <ConfirmationModal
-          onContinue={() => DeleteOrder(index)}
-          message="Are you sure you want to delete this ?"
-        />,
-        "md"
-      )
-    );
-  };
+
+  // const DeleteOrder = async (index: number) => {
+  //   const { data } = await instance.delete(
+  //     `/transactions/delete-order/${orders[index]._id}`
+  //   );
+  //   dispatch(closeModal());
+  //   if (data.error) {
+  //     showAlert("Error", data?.message, "error");
+  //   } else {
+  //     orders.splice(index, 1);
+  //     setOrders([...orders]);
+  //     showAlert("Success", data?.message, "success");
+  //   }
+  // };
+
+  // const openDeleteModal = (index: number) => {
+  //   dispatch(
+  //     openModal(
+  //       <ConfirmationModal
+  //         onContinue={() => DeleteOrder(index)}
+  //         message="Are you sure you want to delete this ?"
+  //       />,
+  //       "md"
+  //     )
+  //   );
+  // };
   const ViewOrder = (id: string) =>
     navigation(routes.dashboard_single_order, { state: id });
 
@@ -174,7 +167,7 @@ export default function Orders() {
                         </DropdownItem>
                         <DropdownItem
                           className="py-1 my-1 rounded text-deep-green-100 hover:bg-deep-blue-100 hover:text-white"
-                          onClick={() => openDeleteModal(index)}
+                          // onClick={() => openDeleteModal(index)}
                         >
                           Delete
                         </DropdownItem>

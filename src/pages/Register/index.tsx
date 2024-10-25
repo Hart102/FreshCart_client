@@ -22,7 +22,7 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterationSchema) => {
     setIsLoading(true);
-    const request = await instance.post("/user/register", data);
+    const request = await instance.put("/user/register", data);
     const response = await request.data;
     setIsLoading(false);
     if (response.isError) return showAlert("Error", response?.message, "error");

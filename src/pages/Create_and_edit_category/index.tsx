@@ -65,7 +65,7 @@ export default function EditAndEditCategory() {
             placeholder="Category Name"
             classNames={{
               inputWrapper: "px-0",
-              input: "bg-white rounded-lg outline-none px-2 border",
+              input: "bg-white rounded-lg outline-none px-2",
             }}
             {...register("name")}
           />
@@ -102,7 +102,7 @@ export default function EditAndEditCategory() {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <Spinner color="white" size="sm" />
-                  <span>Please wait...</span>
+                  <span className="text-white">Please wait...</span>
                 </div>
               ) : (
                 "CREATE CATEGORY"

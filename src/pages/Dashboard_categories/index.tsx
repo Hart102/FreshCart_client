@@ -36,7 +36,7 @@ export default function Categories() {
   const [query, setQuery] = useState<string>("");
 
   const FetchCategories = async () => {
-    const { data } = await instance.get("/categories/fetch-all-categorie");
+    const { data } = await instance.get("/categories/");
     if (!data.isError) {
       setCategories(data.payload);
     }
