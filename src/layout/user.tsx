@@ -40,7 +40,7 @@ export default function UserDasboardLayout() {
   return (
     <>
       <NewNavBar />
-      <div className="w-full md:w-11/12 px-4 md:px-16 mx-auto md:py-8 text-dark-gray-100">
+      <div className="w-full md:w-11/12 px-4 md:px-10 mx-auto md:py-8 text-dark-gray-100">
         <div className="relative md:mt-5 md:flex gap-10 pb-10">
           <div
             className={`w-full md:w-3/12 h-screen md:h-fit md:pr-4 md:border-r border-dotted
