@@ -10,13 +10,20 @@ export const setCartCount = (value: string) =>
 
 export const getCartCount = () => {
   const itemsCount = localStorage.getItem("cartItems");
-  
-  if (itemsCount) {
-    return JSON.parse(itemsCount);
+
+  // Check if itemsCount is defined and valid JSON
+  if (itemsCount && itemsCount !== "undefined") {
+    try {
+      return JSON.parse(itemsCount);
+    } catch (error) {
+      console.error("Error parsing cartItems:", error);
+      return null;
+    }
   } else {
     return null;
   }
 };
+
 
 export const divideAndInsertBr = (text: string) => {
   if (text.length <= 41) {
