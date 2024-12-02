@@ -18,5 +18,5 @@
 
 
 ## Preview Link:
-https://online-store-mk6gluh4v-chikanma2023s-projects.vercel.app/
+https://online-store-neon-one.vercel.app/
 
